@@ -31,6 +31,9 @@ export default function withEcharts(WrappedComponent){
 
         chartResize(){
             let instance = this.instanceRef.current.instance;
+            if(!instance){
+                throw new Error(`withEcharts Error: 被包装的组件必须要有instance实例属性指向echarts实例`)
+            }
             instance.resize()
         }
 

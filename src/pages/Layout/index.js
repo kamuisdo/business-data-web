@@ -59,14 +59,7 @@ export default class PageLayout extends React.Component {
                     <Header className="site-layout-background" style={{ padding: 0 }}>
                         {toggleBtn}
                     </Header>
-                    <Content
-                        className="site-layout-background"
-                        style={{
-                            margin: '24px 16px',
-                            padding: 24,
-                            minHeight: 280,
-                        }}
-                    >
+                    <Content className="site-layout-background" style={{backgroundColor:'#fafafa',padding:'10px'}}>
                         {this.props.content}
                     </Content>
                 </Layout>

@@ -36,23 +36,23 @@ export default class PageLayout extends React.Component {
                             <Link to="/index" >全国数据统计</Link>
                         </Menu.Item>
                         <Menu.Item key="single" icon={<VideoCameraOutlined />}>
-                            <Link to="/single" >单机搜索</Link>
+                            <Link to="/demo" >demo页</Link>
                         </Menu.Item>
-                        <Menu.Item key="sensor" icon={<UploadOutlined />}>
-                            <Link to="/sensor" >传感器</Link>
-                        </Menu.Item>
-                        <Menu.Item key="outer" icon={<UploadOutlined />}>
-                            <Link to="/outer" >室外机</Link>
-                        </Menu.Item>
-                        <Menu.Item key="inner" icon={<UploadOutlined />}>
-                            <Link to="/inner" >室内机</Link>
-                        </Menu.Item>
-                        <Menu.Item key="xinfeng" icon={<UploadOutlined />}>
-                            <Link to="/xinfeng" >新风机</Link>
-                        </Menu.Item>
-                        <Menu.Item key="error" icon={<UploadOutlined />}>
-                            <Link to="/error" >异常</Link>
-                        </Menu.Item>
+                        {/*<Menu.Item key="sensor" icon={<UploadOutlined />}>*/}
+                        {/*    <Link to="/sensor" >传感器</Link>*/}
+                        {/*</Menu.Item>*/}
+                        {/*<Menu.Item key="outer" icon={<UploadOutlined />}>*/}
+                        {/*    <Link to="/outer" >室外机</Link>*/}
+                        {/*</Menu.Item>*/}
+                        {/*<Menu.Item key="inner" icon={<UploadOutlined />}>*/}
+                        {/*    <Link to="/inner" >室内机</Link>*/}
+                        {/*</Menu.Item>*/}
+                        {/*<Menu.Item key="xinfeng" icon={<UploadOutlined />}>*/}
+                        {/*    <Link to="/xinfeng" >新风机</Link>*/}
+                        {/*</Menu.Item>*/}
+                        {/*<Menu.Item key="error" icon={<UploadOutlined />}>*/}
+                        {/*    <Link to="/error" >异常</Link>*/}
+                        {/*</Menu.Item>*/}
                     </Menu>
                 </Sider>
                 <Layout className="site-layout">
@@ -60,7 +60,7 @@ export default class PageLayout extends React.Component {
                         {toggleBtn}
                     </Header>
                     <Content className="site-layout-background" style={{backgroundColor:'#fafafa',padding:'10px'}}>
-                        {this.props.content}
+                        {this.props.content ? this.props.content : this.props.children}
                     </Content>
                 </Layout>
             </Layout>

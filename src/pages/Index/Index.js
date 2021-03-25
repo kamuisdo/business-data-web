@@ -99,6 +99,6 @@ class IndexContent extends React.Component{
 
 export default class Index extends React.Component{
     render() {
-        return (<PageLayout content={ <IndexContent/> } />)
+        return (<PageLayout><IndexContent/></PageLayout>)
     }
 }

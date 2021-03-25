@@ -12,6 +12,7 @@
     "antd": "^4.13.1",
     "axios": "^0.21.1",
     "craco-less": "^1.17.1",
+    "dayjs": "^1.10.4",
     "echarts": "^5.0.2",
     "echarts-bmap": "^1.0.3",
     "env-cmd": "^10.1.0",

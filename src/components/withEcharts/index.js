@@ -20,12 +20,12 @@ export default function withEcharts(WrappedComponent){
         }
 
         componentDidMount() {
-            console.log('withEcharts componentDidMount');
+            // console.log('withEcharts componentDidMount');
             window.addEventListener('resize', this.chartResize);
         }
 
         componentWillUnmount() {
-            console.log('withEcharts componentWillUnmount')
+            // console.log('withEcharts componentWillUnmount')
             window.removeEventListener('resize', this.chartResize)
         }
 
@@ -38,7 +38,7 @@ export default function withEcharts(WrappedComponent){
         }
 
         render() {
-            console.log(`withEcharts render`)
+            // console.log(`withEcharts render`)
             return <WrappedComponent {...this.props} ref={this.instanceRef}/>
         }
     }

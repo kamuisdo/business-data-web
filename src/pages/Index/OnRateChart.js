@@ -70,8 +70,6 @@ class PieChart extends React.Component{
 
 export default class OnRateChart extends React.Component{
 
-
-
     render() {
         let {title,data} = this.props;
         let PieWithEcharts = withEcharts(PieChart)

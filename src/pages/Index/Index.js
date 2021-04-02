@@ -7,8 +7,7 @@ import ContentWrapper from "../../components/ContentWrapper";
 import OverallItem from "./OverallItem";
 import AddressSelector from '../../components/AddressSelector'
 import OnRateChart from "./OnRateChart";
-// import apiCollection from "../../api/apiCollection";
-// import { getUserInfo } from '../../api/apiCollection'
+import { getUserInfo } from '../../api/demo'
 
 
 class IndexContent extends React.Component{
@@ -24,9 +23,9 @@ class IndexContent extends React.Component{
     }
 
     componentDidMount() {
-        // getUserInfo({a:'1'}).then(function (data){
-        //     console.log(data)
-        // })
+        getUserInfo({a:'1'}).then(function (data){
+            console.log(data)
+        })
     }
 
     onRateFormFinish(){}

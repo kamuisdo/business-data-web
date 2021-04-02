@@ -1,7 +1,9 @@
 import './App.less';
 import Login from "./pages/login/Login";
-import Index from "./pages/Index/Index";
 import Demo from "./pages/Demo";
+import OverviewPage from "./pages/Overview";
+import OnlineRateSinglePage from './pages/OnlineRate_Single'
+import OnlineRateMulti from "./pages/OnlineRate_Multi";
 import NotFound from "./pages/NotFound/NotFound";
 import {
     Switch,
@@ -13,12 +15,18 @@ import 'antd/dist/antd.css';
 function App() {
     return (
         <Switch>
-            <Redirect exact from="/" to="/index"/>
+            <Redirect exact from="/" to="/overview"/>
             <Route path="/login">
                 <Login/>
             </Route>
-            <Route path="/index">
-                <Index/>
+            <Route path="/overview">
+                <OverviewPage/>
+            </Route>
+            <Route path="/online-rate-single">
+                <OnlineRateSinglePage/>
+            </Route>
+            <Route path="/online-rate-multi">
+                <OnlineRateMulti/>
             </Route>
             <Route path="/demo">
                 <Demo/>

@@ -1,60 +1,39 @@
-import React from "react";
-import PageLayout from "../Layout";
+import React from 'react'
 import SearchForm from "../../components/SearchForm";
+import TypeSelector from "../../components/TypeSelector";
 import AreaSelector from "../../components/AreaSelector";
 import TimeRangeSelector from "../../components/TimeRangeSelector";
 import TimeUnitSelector from "../../components/TimeUnitSelector";
-import TypeSelector from "../../components/TypeSelector";
-import * as api from '../../api/onlineCountSingle'
-import OnlineCountBarChart from "./OnlineCountBar";
+import ProjectCascadeSelector from "../../components/ProjectCascadeSelector";
 import NoChart from "../../components/NoChart";
+import EnergyBarChart from "./EnergyBarChart";
+import PageLayout from "../Layout";
+import * as api from '../../api/energy'
 
-
-
-
-export default class OnlineRateSinglePage extends React.Component{
+export default class EnergySinglePage extends React.Component{
 
     constructor(props) {
         super(props);
         this.handleSearch = this.handleSearch.bind(this)
         this.state = {
-            countBarData:null,
             formData:null
         }
-
     }
 
     handleSearch(value){
-        console.log(value)
         this.setState({
             formData:value
         })
     }
 
-    componentDidMount() {
-        api.onlineCountBar().then((data)=>{
-            this.setState({
-                countBarData:data
-            })
-        })
-    }
-
-    componentWillUnmount() {
-        this.setState = (state,callback)=>{
-            return;
-        };
-    }
 
     render() {
-        let { formData,countBarData } = this.state;
+        let {formData} = this.state;
         return (
-            <PageLayout title="在线数量统计分析">
+            <PageLayout title="单器械电力消耗统计">
                 <div style={{display:'block'}}>
                     <SearchForm onFinish={this.handleSearch}>
-                        <div className="searchForm-row">
-                            <TypeSelector required/>
-                            <AreaSelector />
-                        </div>
+                        <ProjectCascadeSelector />
                         <div className="searchForm-row">
                             <TimeRangeSelector required/>
                         </div>
@@ -65,10 +44,9 @@ export default class OnlineRateSinglePage extends React.Component{
                     </SearchForm>
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: <OnlineCountBarChart seriesData={countBarData}/>}
+                    { formData===null ? <NoChart />: <EnergyBarChart requestFn={api.getEnergyBarChart} query={formData} />}
                 </div>
             </PageLayout>
-
         )
     }
 }

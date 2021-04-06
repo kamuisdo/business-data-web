@@ -71,7 +71,10 @@ export default function requestFactory(apiOpt={}){
         return axios.request(axiosConfig).then((res)=>{
             let ifError = res.data.error;
             if(ifError){
-                //TODO 处理错误
+                //TODO 此处可加入默认的发生错误时的副作用
+
+                // 默认将错误继续抛出
+                throw new Error(res.data.message)
             }
             return res.data.data
         })

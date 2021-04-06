@@ -51,6 +51,14 @@ router.post('/getProvinceTable',(req,res,next)=>{
 })
 
 
+// getCityInfo
+router.post('/getCityInfo',(req,res,next)=>{
+
+
+    res.locals.data = ['上海','江苏','安徽','浙江','云南','贵州','广西','广东','福建','海南','河北','山西','北京','天津','山东','新疆','西藏','甘肃','青海','宁夏','陕西','河南','湖北','湖南','江西','四川','重庆','内蒙古','辽宁','黑龙江','吉林'].map((v)=>{ return {cityName:v,cityCode:v} })
+
+    next()
+})
 
 
 

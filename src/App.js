@@ -4,6 +4,7 @@ import Demo from "./pages/Demo";
 import OverviewPage from "./pages/Overview";
 import OnlineRateSinglePage from './pages/OnlineRate_Single'
 import OnlineRateMulti from "./pages/OnlineRate_Multi";
+import EnergySinglePage from "./pages/Energy_Single";
 import NotFound from "./pages/NotFound/NotFound";
 import {
     Switch,
@@ -27,6 +28,9 @@ function App() {
             </Route>
             <Route path="/online-rate-multi">
                 <OnlineRateMulti/>
+            </Route>
+            <Route path="/energy-single">
+                <EnergySinglePage/>
             </Route>
             <Route path="/demo">
                 <Demo/>

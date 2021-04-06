@@ -47,10 +47,13 @@ class TimeRangeSelector extends React.Component{
 
 
     render() {
-        let {label='时间',required} = this.props;
+        let {label='时间',required,rules=[]} = this.props;
+        if(required){
+            rules.push({ required:true,message:'请输入时间范围' })
+        }
         return (
-            <Form.Item label={label} required={required} className="timeRange-wrapper">
-                <Form.Item name="timeRange">
+            <Form.Item label={label} required={required}  className="timeRange-wrapper">
+                <Form.Item name="timeRange" rules={rules}>
                     <RangePicker style={{width: '18vw'}} />
                 </Form.Item>
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import * as echarts from "echarts";
+import {Button} from 'antd'
 import deepmerge from "deepmerge";
 import isArray from 'lodash/isArray'
 import isPlainObject from 'lodash/isPlainObject'
+import ErrorChart from "../ErrorChart";
 
 function getDisplayName(WrappedComponent) {
     return WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -35,40 +37,42 @@ export default function withEcharts(WrappedComponent){
             this.chartResize = this.chartResize.bind(this);
             this.getOptionWithDefault = this.getOptionWithDefault.bind(this)
             this.initEcharts = this.initEcharts.bind(this)
+            this.state = {
+                ifError:false
+            }
+            this.handleReload = this.handleReload.bind(this)
+            // this.handleRef = this.handleRef.bind(this)
         }
 
         componentDidMount() {
+            // console.log(`----- ${WithEcharts.displayName} componentDidMount -----`)
+            // console.log(this.instanceRef)
             window.addEventListener('resize', this.chartResize);
-            this.loading()
         }
 
-        componentDidUpdate(prevProps, prevState, snapshot){
-            this.loading()
-        }
+        // componentDidUpdate(prevProps, prevState, snapshot){
+        //     // 比较query是不是发生变化，query变化了之后，调用组件的loadData方法
+        //     // console.log('---- WithEcharts componentDidUpdate -----')
+        //     // console.log(prevProps)
+        //     // console.log(this.props)
+        //     if(this.props.query && (prevProps.query !== this.props.query)){
+        //         if(!this.instanceRef.current.loadData){
+        //             throw new Error(`withEcharts组件需要实现loadData方法`)
+        //         }
+        //        // this.instanceRef.current.loadData()
+        //     }
+        // }
 
-        componentWillUnmount() {
-            // console.log('withEcharts componentWillUnmount')
-            window.removeEventListener('resize', this.chartResize)
-        }
 
         chartResize(){
-            let instance = this.instanceRef.current.instance;
-            if(!instance){
-                throw new Error(`withEcharts Error: 被包装的组件必须要有instance实例属性指向echarts实例`)
+            // console.log(`----- ${WithEcharts.displayName} withEcharts chartResize -----`)
+            // console.log(this.instanceRef.current)
+            let instance = this.instanceRef.current ? this.instanceRef.current.instance : null;
+            if(instance){
+                instance.resize()
             }
-            instance.resize()
         }
 
-        loading(){
-            // let instance = this.instanceRef.current.instance;
-            // let {seriesData} = this.props;
-            // // series props 指定是null的时候才执行加载动画
-            // if(seriesData === null){
-            //     instance.showLoading()
-            // }else {
-            //     instance.hideLoading()
-            // }
-        }
 
         // 获取默认的全局echarts设置
         getOptionWithDefault(opt={}){
@@ -156,12 +160,58 @@ export default function withEcharts(WrappedComponent){
             return echarts.init(dom,theme,opt)
         }
 
+
+        // 加载失败之后重新加载
+        handleReload(){
+            this.setState({ ifError:false })
+        }
+        //
+        // handleRef(el){
+        //     console.log(`----- ${WithEcharts.displayName} handleRef -----`)
+        //     console.log(el)
+        //     this.instanceRef = el
+        // }
+
+        componentWillUnmount() {
+            window.removeEventListener('resize', this.chartResize)
+            this.setState = (state,callback)=>{
+                return;
+            };
+        }
+
+
         render() {
             // console.log(`withEcharts render`)
-            return <WrappedComponent {...this.props}
-                                     initEcharts={this.initEcharts}
-                                     getOptionWithDefault={this.getOptionWithDefault}
-                                     ref={this.instanceRef}/>
+            let {requestFn,...rest} = this.props;
+            // 对请求数据的方法加工loading效果和错误处理
+            let tempFn = requestFn
+            if(requestFn){
+                tempFn = (...arg)=>{
+                    // console.log(`----- ${WithEcharts.displayName} requestFn -----`)
+                    // console.log(that.instanceRef)
+                    // console.log(that.instanceRef.current)
+                    // console.log(arg)
+                    let instance = arg[0]
+                    let params = arg[1]
+                    instance.showLoading()
+                    return requestFn(params).then((data)=>{
+                        instance.hideLoading();
+                        return data
+                    }).catch((err)=>{
+                        console.log(`----- ${WithEcharts.displayName} requestFn Catch -----`)
+                        instance.hideLoading();
+                        this.setState({ ifError:true })
+                    })
+                }
+            }
+            let errorNode = <ErrorChart handleClick={this.handleReload}/>
+            // console.log('-------- withEcharts render --------')
+
+            return this.state.ifError ? errorNode : <WrappedComponent {...rest}
+                                                                      requestFn={tempFn}
+                                                                      initEcharts={this.initEcharts}
+                                                                      getOptionWithDefault={this.getOptionWithDefault}
+                                                                      ref={this.instanceRef}/>
         }
     }
 

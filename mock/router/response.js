@@ -1,11 +1,12 @@
 module.exports = function (req,res){
     let data = res.locals.data;
+    let error = !!res.locals.error;
     let resData = {
-        error:false,
+        error,
         data
     }
     setTimeout(()=>{
         res.status(200).json(resData)
-    },5000)
+    },2000)
     
 }

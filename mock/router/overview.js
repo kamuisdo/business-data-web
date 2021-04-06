@@ -51,9 +51,25 @@ router.post('/chinaMap',function (req,res,next){
             innerCount:4353
         }
     }
+    // res.locals.error = true
 
     next()
 })
+
+/**
+ * 统计总数
+ */
+router.post('/chinaMapCount',function (req,res,next){
+    res.locals.data = {
+        projectCount:234234,
+        lcCount:7345,
+        sysCount:5432,
+        innerCount:4353
+    }
+
+    next()
+})
+
 
 /**
  * 在线率趋势图

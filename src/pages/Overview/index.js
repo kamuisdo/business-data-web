@@ -11,6 +11,7 @@ import ProjectTypeCountChart from "./ProjectTypeChart";
 import HpCountChart from "./HpCountChart";
 import LcLinkCountChart from "./LcLinkCountPie";
 import ProjectProvinceCountChart from "./ProjectProvinceCountChart";
+import moment from 'moment';
 import * as api from '../../api/overview'
 import {Button} from "antd";
 import {DownOutlined, UpOutlined} from "@ant-design/icons";
@@ -21,22 +22,16 @@ export default class OverviewPage extends React.Component{
         super(props);
         this.state = {
             searchShow:false,
-            mapData:{},
-            onlineCountLineData:null
+            formData:{ timeRange:[moment().subtract(30, 'days'), moment()] }
         }
         this.handleClickSearchFormBtn = this.handleClickSearchFormBtn.bind(this)
+        this.handleSearch = this.handleSearch.bind(this)
     }
 
-    componentDidMount() {
-        api.chinaMap().then((data)=>{
-            console.log(data)
-        })
-        api.onlineCountLine().then((data)=>{
-            this.setState({
-                onlineCountLineData:data
-            })
-        })
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log('---- OverviewPage componentDidUpdate ------')
     }
+
 
     handleClickSearchFormBtn(){
         this.setState({
@@ -44,23 +39,26 @@ export default class OverviewPage extends React.Component{
         })
     }
 
-    componentWillUnmount() {
-        this.setState = (state,callback)=>{
-            return;
-        };
+    handleSearch(value){
+        this.setState({
+            formData:value
+        })
     }
+
 
     render() {
         let searchBtnIcon = this.state.searchShow ? <DownOutlined/> : <UpOutlined />;
         let searchFormStyle=this.state.searchShow ? {display:'block'}:{display: 'none'}
-        // let searchFormStyle = { hidden:!this.state.searchShow }
+        let { formData } = this.state;
+        // 默认展示近7天
+        let initialValues = { timeRange:[moment().subtract(30, 'days'), moment()] }
         return (
             <PageLayout title="商用智能VRV整体概况">
                 <Button style={{float:'right',marginTop:'-60px'}} onClick={this.handleClickSearchFormBtn} type="link">搜索条件{searchBtnIcon}</Button>
                 <div style={searchFormStyle}>
-                    <SearchForm onFinish={this.handleSearch}>
+                    <SearchForm initialValues={initialValues} onFinish={this.handleSearch}>
                         <div className="searchForm-row">
-                            <TimeRangeSelector title="创建时间"/>
+                            <TimeRangeSelector required title="创建时间"/>
                         </div>
                         <div className="searchForm-row">
                             <AreaSelector />
@@ -70,14 +68,14 @@ export default class OverviewPage extends React.Component{
                 <div>
                     <div style={{display:'flex',flexWrap:'nowrap'}}>
                         <div className='chart-box' style={{width:'60vw',marginRight:'20px'}}>
-                            <ChinaMapChart size='430px'/>
+                            <ChinaMapChart requestFn={api.chinaMap} query={formData} size='430px'/>
                         </div>
                         <div className="chart-box" style={{width:'calc(100% - 60vw)'}}>
-                            <ChinaMapCount/>
+                            <ChinaMapCount query={formData}/>
                         </div>
                     </div>
                     <div className="chart-box">
-                            <OnlineCountChart seriesData={this.state.onlineCountLineData}/>
+                            <OnlineCountChart requestFn={api.onlineCountLine} query={formData} />
                     </div>
                     <div style={{clear: 'both'}}>
                         <div className="chart-box" style={{ width:'calc((100% - 20px)/2)',marginRight:'20px',float:'left' }}>

@@ -17,7 +17,6 @@ const provinceList = Object.keys(areaMap);
 export default class AreaSelector extends React.Component{
     constructor(props) {
         super(props);
-        this.handleAreaChange = this.handleAreaChange.bind(this)
         this.state = {
             area:null,
             provinceList:[],
@@ -28,19 +27,11 @@ export default class AreaSelector extends React.Component{
         this.cityRef = React.createRef()
     }
 
-    handleAreaChange(value){
-        let provinceList = areaMap[value];
-        this.setState({
-            area:value,
-            provinceList:provinceList
-        })
-    }
 
 
 
     render() {
         let {ifProvinceVisible=true,ifCityVisible=true} = this.props
-        let {region,province,city} = this.state;
         return(
             <>
                 <Form.Item
@@ -49,8 +40,7 @@ export default class AreaSelector extends React.Component{
                 >
                     <ApiSelect
                         placeholder="请选择地区"
-                        // onChange={this.handleAreaChange}
-                        request={api.getRegionInfo}
+                        requestFn={api.getRegionInfo}
                         textField="regionName"
                         valueField="regionCode"
                         cascadeBy={[this.provinceRef]}
@@ -68,12 +58,12 @@ export default class AreaSelector extends React.Component{
                     <ApiSelect
                         placeholder="请选择省份"
                         ref={this.provinceRef}
-                        // query={{region}}
-                        request={api.getProvinceInfo}
+                        requestFn={api.getProvinceInfo}
                         textField="provinceName"
                         valueField="provinceCode"
+                        cascadeBy={[this.cityRef]}
                         cascading={true}
-                        cascadeParams={(value)=>{ console.log(value);return{ region:value } }}
+                        cascadeParams={(value)=>{ return{ region:value } }}
                     />
                     {/*<Select style={{ width: '12vw' }} disabled={!this.state.area} value={this.state.provinceVal}*/}
                     {/*        placeholder="请选择省份">*/}
@@ -86,12 +76,22 @@ export default class AreaSelector extends React.Component{
                     label="市"
                     name="city"
                 >
-                    <Select style={{ width: '12vw' }} disabled={!this.state.provinceVal}
-                            placeholder="请选择市">
-                        { this.state.provinceList.map((v)=>{
-                            return <Option key={v} value={v}>{v}</Option>
-                        }) }
-                    </Select>
+                    {/*<Select style={{ width: '12vw' }} disabled={!this.state.provinceVal}*/}
+                    {/*        placeholder="请选择市">*/}
+                    {/*    { this.state.provinceList.map((v)=>{*/}
+                    {/*        return <Option key={v} value={v}>{v}</Option>*/}
+                    {/*    }) }*/}
+                    {/*</Select>*/}
+                    <ApiSelect
+                        placeholder="请选择市"
+                        showSearch={true}
+                        ref={this.cityRef}
+                        requestFn={api.getCityInfo}
+                        textField="cityName"
+                        valueField="cityCode"
+                        cascading={true}
+                        cascadeParams={(value)=>{ return{ province:value } }}
+                    />
                 </Form.Item> }
 
             </>

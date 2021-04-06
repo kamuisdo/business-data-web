@@ -4,6 +4,8 @@ let overviewRouter = require('./router/overview')
 let onlineCountSingleRouter = require('./router/onlineCountSingle')
 let onlineCountMultiRouter = require('./router/onlineCountMulti')
 let areaRouter = require('./router/area')
+let commonRouter = require('./router/common')
+let energyRouter = require('./router/energy')
 let app = express();
 
 app.use(express.json());
@@ -27,6 +29,8 @@ app.use('/mock/overview',overviewRouter)
 app.use('/mock/onlineCountSingle',onlineCountSingleRouter)
 app.use('/mock/onlineCountMulti',onlineCountMultiRouter)
 app.use('/mock/area',areaRouter)
+app.use('/mock/common',commonRouter)
+app.use('/mock/energy',energyRouter)
 
 app.use(responseMiddle)
 

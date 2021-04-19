@@ -17,6 +17,16 @@ router.post('/onlineCountSingleLine',(req,res,next)=>{
 })
 
 
+/**
+ * 在线率数量
+ */
+router.post('/getOnlineRateLine',(req,res,next)=>{
+    res.locals.data = utils.createRandomData(0,2)
+
+    next()
+})
+
+
 
 
 

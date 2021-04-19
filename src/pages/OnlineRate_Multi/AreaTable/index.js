@@ -1,7 +1,6 @@
 import React from "react";
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import {Table} from "antd";
-import areaList from "../../../enum/areaList";
+import { getRegionInfoAsync } from '../../../api/common'
 
 export default class AreaTable extends React.Component{
     constructor(props) {
@@ -44,8 +43,9 @@ export default class AreaTable extends React.Component{
     render() {
         const { selectedRowKeys } = this.state;
         let columns = [{ title:'地区',dataIndex:'area' }]
+        let areaList = getRegionInfoAsync()
         let dataSource = areaList.map((v,index)=>{
-            return { key:v,area:v }
+            return { key:v.value,area:v.text }
         })
         const rowSelection = {
             selectedRowKeys,
@@ -58,6 +58,7 @@ export default class AreaTable extends React.Component{
             dataSource={dataSource}
             rowSelection={rowSelection}
             pagination={false}
+            scroll={{ y: '200px' }}
         />)
     }
 }

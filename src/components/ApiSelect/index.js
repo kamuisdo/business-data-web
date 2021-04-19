@@ -11,7 +11,7 @@ const {Option} = Select;
 function cascadeAll(byList,currentVal){
     if(byList && byList.length > 0){
         byList.map((ref)=>{
-            if(ref.current.cascadeChange){
+            if(ref&&ref.current&&ref.current.cascadeChange){
                 ref.current.cascadeChange(currentVal);
                 cascadeAll(ref.current.props.cascadeBy,null)
             }
@@ -26,15 +26,25 @@ export default class ApiSelect extends React.Component{
 
     constructor(props) {
         super(props);
-        let {cascading,disabled} = this.props;
+        let {cascading,disabled,initialParams,cascadeParams} = this.props;
+        // 取到初始的cascading的值
+        let cascadingVal = cascading && cascading.current && cascading.current.state ? cascading.current.state.value : null;
+        this.cascadingVal = cascadingVal;
+        // 判断初始的cascadingVal是否有值
+        let hasCascadingVal = cascadingVal !== undefined && cascadingVal !== null
+        this.hasCascadingVal = hasCascadingVal;
         this.state = {
-            loading:!cascading, // 没有联动的话就直接请求数据
+            loading:hasCascadingVal, // 没有联动的话就直接请求数据
             ifError:false,
-            apiDisabled:cascading ? true : disabled,
+            apiDisabled: cascading ? ( hasCascadingVal ? disabled : true ) : disabled,
             value:null,
             data:[]
         }
-        this.cascadeParamsData = {}
+        // 初始的参数，应对cascading的Select在已经有值的情况下，加载了监听他的Select，此Select应该根据初始值获取下拉框数据，接触disable状态
+        // 如果有初始值并且设置返回初始值参数的方法则调用，生成默认的cascadeParamsData
+        // initialParams 默认取cascadeParams
+        let initialParamsFn = initialParams || cascadeParams;
+        this.cascadeParamsData = hasCascadingVal && initialParamsFn ? initialParamsFn(cascadingVal) : {};
         this.loadData = this.loadData.bind(this)
         this.cascadeOnChange = this.cascadeOnChange.bind(this)
         this.cascadeChange = this.cascadeChange.bind(this)
@@ -42,28 +52,25 @@ export default class ApiSelect extends React.Component{
 
 
     componentDidMount() {
-        if(!this.props.cascading){
+        // console.log(this.hasCascadingVal)
+        let {cascading} = this.props;
+        if(!cascading || this.hasCascadingVal){
             this.loadData()
         }
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        // this.loadData()
-        // console.log('---- componentDidUpdate -----')
-        // console.log(prevState)
-        // console.log(prevProps)
-        // console.log(snapshot)
-
-    }
 
     loadData(){
-        let {requestFn,query} = this.props;
+        let {requestFn,query,valueField} = this.props;
         let cascadeParamsData = this.cascadeParamsData;
         this.setState({
             loading:true
         })
         requestFn(Object.assign(cascadeParamsData,query)).then((data)=>{
             if(!isArray(data)){ throw new Error('APISelect Error：requestFn需要返回数组')}
+            data = data.map((v)=>{
+                return Object.assign(v,{ key:v[valueField] })
+            })
             this.setState({
                 loading:false,
                 apiDisabled:false,
@@ -88,14 +95,10 @@ export default class ApiSelect extends React.Component{
                 value:null, // 加载成功之后重置原来的选中的值
             })
         }else {
-            let orgParams = this.cascadeParamsData;
-            let newParams = this.props.cascadeParams(value);
-            if(orgParams !== newParams){
-                this.cascadeParamsData = newParams
-                this.loadData()
-            }
+            let params = this.props.cascadeParams ? this.props.cascadeParams(value): {};
+            this.cascadeParamsData = params
+            this.loadData()
         }
-
     }
 
     componentWillUnmount() {
@@ -129,7 +132,7 @@ export default class ApiSelect extends React.Component{
 
     render() {
         let {data,loading,apiDisabled,value} = this.state;
-        let {valueField,textField,dropdownRender,style,disabled,cascading,cascadeBy,cascadeParams,requestFn,...rest} = this.props;
+        let {valueField,textField,dropdownRender,style,disabled,cascading,cascadeBy,cascadeParams,requestFn,allowClear,...rest} = this.props;
         let apiDropDownRender = (menu)=>{
             let {loading,ifError} = this.state;
             let menuDom = dropdownRender ? dropdownRender(menu) : menu;
@@ -155,7 +158,9 @@ export default class ApiSelect extends React.Component{
                         style={apiStyle}
                         dropdownRender={apiDropDownRender}
                         onChange={this.cascadeOnChange}
+                        allowClear={allowClear !== false}
                         disabled={apiDisabled}
+                        optionFilterProp="children"   // 搜索文本不搜索value
                         loading={loading}>
                     {
                         data.map((item)=>{
@@ -175,7 +180,7 @@ ApiSelect.propTypes = {
     textField:PropTypes.string.isRequired,
     requestFn:PropTypes.func.isRequired,
     query:PropTypes.object,
-    cascading:PropTypes.bool,   // 是否跟随某个selector联动
+    cascading:PropTypes.object,   // 根据那个APISelect的实例联动，refs对象
     cascadeBy:PropTypes.array,   // 被那些组件联动
     cascadeParams:PropTypes.func,   // 获取联动组件的请求参数，返回对象
 }

@@ -1,18 +1,8 @@
 import React from "react";
 import * as api from '../../api/common'
 import ApiSelect from "../ApiSelect";
-import {Form,Select} from 'antd'
-const { Option } = Select;
+import {Form} from 'antd'
 
-const areaMap = {
-    '华东':['上海','江苏','安徽','浙江'],
-    '华南':['云南','贵州','广西','广东','福建','海南'],
-    '华北':['河北','山西','北京','天津','山东'],
-    '中西部':['新疆','西藏','甘肃','青海','宁夏','陕西','河南','湖北','湖南','江西','四川','重庆'],
-    '东北':['内蒙古','辽宁','黑龙江','吉林']
-}
-
-const provinceList = Object.keys(areaMap);
 
 export default class AreaSelector extends React.Component{
     constructor(props) {
@@ -23,6 +13,7 @@ export default class AreaSelector extends React.Component{
             province:null,
             city:null
         }
+        this.areaRef = React.createRef()
         this.provinceRef = React.createRef()
         this.cityRef = React.createRef()
     }
@@ -31,66 +22,54 @@ export default class AreaSelector extends React.Component{
 
 
     render() {
-        let {ifProvinceVisible=true,ifCityVisible=true} = this.props
+        let {ifProvinceVisible=true,ifCityVisible=true,areaRules,provinceRules,cityRules} = this.props
         return(
             <>
                 <Form.Item
                     label="地区"
-                    name="area"
+                    name="regionCode"
+                    rules={areaRules}
                 >
                     <ApiSelect
                         placeholder="请选择地区"
+                        ref={this.areaRef}
                         requestFn={api.getRegionInfo}
-                        textField="regionName"
-                        valueField="regionCode"
+                        textField="text"
+                        valueField="value"
                         cascadeBy={[this.provinceRef]}
                     />
-                    {/*<Select style={{ width: '12vw' }} placeholder="请选择地区" onChange={this.handleAreaChange}>*/}
-                    {/*    {provinceList.map((v)=>{*/}
-                    {/*        return <Option key={v} value={v}>{v}</Option>*/}
-                    {/*    })}*/}
-                    {/*</Select>*/}
                 </Form.Item>
                 { ifProvinceVisible &&  <Form.Item
                     label="省"
-                    name="province"
+                    name="provinceCode"
+                    rules={provinceRules}
                 >
                     <ApiSelect
                         placeholder="请选择省份"
                         ref={this.provinceRef}
                         requestFn={api.getProvinceInfo}
-                        textField="provinceName"
-                        valueField="provinceCode"
+                        textField="text"
+                        valueField="value"
                         cascadeBy={[this.cityRef]}
-                        cascading={true}
-                        cascadeParams={(value)=>{ return{ region:value } }}
+                        cascading={this.areaRef}
+                        cascadeParams={(value)=>{ return {regionCode:value} }}
                     />
-                    {/*<Select style={{ width: '12vw' }} disabled={!this.state.area} value={this.state.provinceVal}*/}
-                    {/*        placeholder="请选择省份">*/}
-                    {/*    { this.state.provinceList.map((v)=>{*/}
-                    {/*        return <Option key={v} value={v}>{v}</Option>*/}
-                    {/*    }) }*/}
-                    {/*</Select>*/}
                 </Form.Item>}
                 { ifCityVisible && <Form.Item
                     label="市"
-                    name="city"
+                    name="cityCode"
+                    rules={cityRules}
                 >
-                    {/*<Select style={{ width: '12vw' }} disabled={!this.state.provinceVal}*/}
-                    {/*        placeholder="请选择市">*/}
-                    {/*    { this.state.provinceList.map((v)=>{*/}
-                    {/*        return <Option key={v} value={v}>{v}</Option>*/}
-                    {/*    }) }*/}
-                    {/*</Select>*/}
                     <ApiSelect
                         placeholder="请选择市"
                         showSearch={true}
                         ref={this.cityRef}
                         requestFn={api.getCityInfo}
-                        textField="cityName"
-                        valueField="cityCode"
-                        cascading={true}
-                        cascadeParams={(value)=>{ return{ province:value } }}
+                        textField="text"
+                        valueField="value"
+                        cascadeBy={[this.projectTypeRef]}
+                        cascading={this.provinceRef}
+                        cascadeParams={(value)=>{ return {provinceCode:value} }}
                     />
                 </Form.Item> }
 

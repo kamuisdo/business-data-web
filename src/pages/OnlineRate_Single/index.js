@@ -7,10 +7,8 @@ import TimeUnitSelector from "../../components/TimeUnitSelector";
 import TypeSelector from "../../components/TypeSelector";
 import * as api from '../../api/onlineCountSingle'
 import OnlineCountBarChart from "./OnlineCountBar";
+import OnlineRateChart from "./OnlineRateChart";
 import NoChart from "../../components/NoChart";
-
-
-
 
 export default class OnlineRateSinglePage extends React.Component{
 
@@ -18,35 +16,19 @@ export default class OnlineRateSinglePage extends React.Component{
         super(props);
         this.handleSearch = this.handleSearch.bind(this)
         this.state = {
-            countBarData:null,
             formData:null
         }
 
     }
 
     handleSearch(value){
-        console.log(value)
         this.setState({
             formData:value
         })
     }
 
-    componentDidMount() {
-        api.onlineCountBar().then((data)=>{
-            this.setState({
-                countBarData:data
-            })
-        })
-    }
-
-    componentWillUnmount() {
-        this.setState = (state,callback)=>{
-            return;
-        };
-    }
-
     render() {
-        let { formData,countBarData } = this.state;
+        let { formData } = this.state;
         return (
             <PageLayout title="在线数量统计分析">
                 <div style={{display:'block'}}>
@@ -65,7 +47,10 @@ export default class OnlineRateSinglePage extends React.Component{
                     </SearchForm>
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: <OnlineCountBarChart seriesData={countBarData}/>}
+                    { formData===null ? <NoChart />: <OnlineCountBarChart requestFn={api.onlineCountBar} query={formData}/>}
+                </div>
+                <div className="chart-box">
+                    { formData===null ? <NoChart />: <OnlineRateChart requestFn={api.getOnlineRateLine} query={formData}/>}
                 </div>
             </PageLayout>
 

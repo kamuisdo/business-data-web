@@ -1,7 +1,5 @@
 import React from "react";
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import {Table} from "antd";
-import areaList from "../../../enum/areaList";
 import * as api from '../../../api/common'
 
 export default class ProvinceTable extends React.Component{
@@ -44,7 +42,7 @@ export default class ProvinceTable extends React.Component{
 
     render() {
         const { selectedRowKeys } = this.state;
-        let columns = [{ title:'地区',dataIndex:'area' },{ title:'省',dataIndex:'province' }]
+        let columns = [{ title:'省',dataIndex:'province' }]
         const rowSelection = {
             selectedRowKeys,
             onChange:this.onTableSelectChange,
@@ -53,26 +51,25 @@ export default class ProvinceTable extends React.Component{
         };
         const requestFn = (params, sorter, filter)=>{
             let t = Object.assign({},this.props.formData,params)
-            return api.getProvinceTable(t).then((data)=>{
+            console.log(t)
+            return api.getProvinceInfo(t).then((data)=>{
                 return {
-                    data: data.list.map((v)=>{return { key:v,area:'华南',province:v }}),
+                    data: data.map((v)=>{return { key:v.value,province:v.text }}),
                     success: true,
                     total: data.total
                 }
             })
-        }
-        let pagination = {
-            pageSize:10
         }
         return (<ProTable
             actionRef={this.props.actionRef}
             columns={columns}
             rowSelection={rowSelection}
             request={requestFn}
-            pagination={pagination}
+            pagination={false}
             search={false}
             options={false}
             tableAlertRender={false}
+            scroll={{ y: '200px' }}
         />)
     }
 }

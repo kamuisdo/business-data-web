@@ -1,6 +1,6 @@
 let express = require('express')
 let router = express.Router()
-let Mock = require('mockjs')
+
 let utils = require('../utils')
 
 /**
@@ -82,6 +82,19 @@ router.post('/onlineCountLine',(req,res,next)=>{
 
     next()
 })
+
+/**
+ * 在线率趋势图
+ */
+router.post('/getProjectTypeChart',(req,res,next)=>{
+    res.locals.data = {
+        projectData:[69,130,12,115,586,3,150,65,122,58,40,51,20],
+        sysData:[350,438,39,578,3561,43,936,761,1081,378,269,71,57]
+    }
+
+    next()
+})
+
 
 
 

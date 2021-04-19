@@ -1,12 +1,11 @@
 import React from 'react'
 import SearchForm from "../../components/SearchForm";
-import TypeSelector from "../../components/TypeSelector";
-import AreaSelector from "../../components/AreaSelector";
 import TimeRangeSelector from "../../components/TimeRangeSelector";
 import TimeUnitSelector from "../../components/TimeUnitSelector";
 import ProjectCascadeSelector from "../../components/ProjectCascadeSelector";
 import NoChart from "../../components/NoChart";
 import EnergyBarChart from "./EnergyBarChart";
+import EnergyErrLineChart from "./EnergyErrLineChart";
 import PageLayout from "../Layout";
 import * as api from '../../api/energy'
 
@@ -45,6 +44,9 @@ export default class EnergySinglePage extends React.Component{
                 </div>
                 <div className="chart-box">
                     { formData===null ? <NoChart />: <EnergyBarChart requestFn={api.getEnergyBarChart} query={formData} />}
+                </div>
+                <div className="chart-box">
+                    { formData===null ? <NoChart />: <EnergyErrLineChart requestFn={api.getEnergyErrLine} query={formData} />}
                 </div>
             </PageLayout>
         )

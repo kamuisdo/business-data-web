@@ -1,0 +1,37 @@
+.air-quality-page{
+  .air-chart-box{
+    width: calc((100%/2) - 10px);
+  }
+  .sensor-item{
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 4px;
+    border-radius: 1px;
+    background-color:#ffffff;
+    color:#7A8392;
+    cursor: pointer;
+    .sensor-item-point{
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+  }
+  .sensor-item-disabled{
+    color:#b3b3b3;
+    .sensor-item-point{
+      background-color: #b3b3b3 !important;
+    }
+  }
+  .sensor-box{
+    width: calc(100% - 100px);
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .sensor-box-collapsed{
+    height: 36px;
+    overflow: hidden;
+  }
+}

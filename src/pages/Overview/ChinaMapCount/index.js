@@ -37,6 +37,12 @@ export default class ChinaMapCount extends React.Component{
         })
     }
 
+    componentWillUnmount() {
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
+
     render() {
         let {projectCount,lcCount,sysCount,innerCount} = this.state;
         return (

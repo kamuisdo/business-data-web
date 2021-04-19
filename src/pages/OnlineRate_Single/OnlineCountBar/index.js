@@ -8,31 +8,16 @@ class OnlineCountBar extends React.Component{
         this.instance = null;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot){
-        let series = this.updateSeries();
-        let option = {
-            series: series
-        }
-        this.instance.setOption(option);
-    }
-
 
     componentDidMount() {
         let { initEcharts,getOptionWithDefault } = this.props;
         let chartDom = document.getElementById('OnlineCountBarChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
-        let series = this.updateSeries();
         let option = getOptionWithDefault({
             title:{
                 text:'在线数量分析表'
             },
-            // legend:{
-            //     left:'center'
-            // },
-            // tooltip:{
-            //   formatter:'{b0}: {c0}<br />{b1}: {c1}'
-            // },
             yAxis: [
                 {
                     type: 'value',
@@ -52,26 +37,35 @@ class OnlineCountBar extends React.Component{
                 type: 'time',
                 boundaryGap: false
             },
-            series: series
+            series: []
         })
         myChart.setOption(option);
+        this.loadData()
+    }
 
+    loadData(){
+        let {query,requestFn} = this.props;
+        return requestFn(this.instance,query).then((data)=>{
+            this.updateSeries(data)
+        })
     }
 
     // 设置line的参数
-    updateSeries(){
-        let { seriesData } = this.props
-        let { warm,cold,temper } = seriesData;
-        return [
+    updateSeries(data){
+        let { warm,cold,temper } = data;
+        let {getDefaultSeriesOpt} = this.props;
+        let series = [
             {
                 name:'暖房',
                 type:'bar',
                 yAxisIndex:0,
                 itemStyle: {
                     color: '#FD507C',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    opacity:0.5
                 },
                 barWidth:2,
+                barGap:'-100%',
                 data:warm
             },
             {
@@ -80,7 +74,8 @@ class OnlineCountBar extends React.Component{
                 yAxisIndex:0,
                 itemStyle: {
                     color: '#2B6AFF',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    opacity:0.5
                 },
                 barWidth:2,
                 data:cold
@@ -99,6 +94,7 @@ class OnlineCountBar extends React.Component{
                 data:temper
             }
         ]
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {
@@ -106,7 +102,7 @@ class OnlineCountBar extends React.Component{
     }
 }
 
-export default class OnlineCountBarChart extends React.Component{
+export default class OnlineCountBarChart extends React.PureComponent{
 
     render() {
         let OnlineCountBarChart = withEcharts(OnlineCountBar)

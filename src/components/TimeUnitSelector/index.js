@@ -5,7 +5,7 @@ const {Option} = Select;
 
 export default class TimeUnitSelector extends React.Component{
     render() {
-        let {data=['天','周','月'],required,rules=[]} = this.props
+        let {data=['小时','天','月'],required,rules=[]} = this.props
         if(required){
             rules.push({ required:true })
         }

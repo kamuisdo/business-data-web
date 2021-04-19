@@ -10,8 +10,9 @@ import TimeUnitSelector from "../../components/TimeUnitSelector";
 import NoChart from "../../components/NoChart";
 import AreaTable from "./AreaTable";
 import ProvinceTable from "./ProvinceTable";
+import CityTable from "./CityTable";
 import OnlineRateMultiChart from "./OnlineRateMultiLine";
-import * as api from '../../api/onlineCountMulti'
+
 import './index.less'
 
 const {Option} = Select
@@ -26,6 +27,7 @@ export default class OnlineRateMulti extends React.Component{
             chartFormData:null,
             chartData:null,
             selected:[],
+            formSelected:[],    // chart根据此字段变更
             ifShowAlert:false
         }
         this.tableRef=React.createRef();
@@ -44,8 +46,6 @@ export default class OnlineRateMulti extends React.Component{
     }
 
     handleClickAddBtn(totalSelected){
-        console.log('-----handleClickAddBtn------')
-        console.log(totalSelected)
         this.setState({
             selected:totalSelected
         })
@@ -65,7 +65,9 @@ export default class OnlineRateMulti extends React.Component{
         if(this.tableRef.current){
             this.tableRef.current.reloadAndRest();
             this.tableRef.current.clearSelected();
-            this.tableWrapperRef.current.reset();
+            if(this.tableWrapperRef.current){
+                this.tableWrapperRef.current.reset();
+            }
         }
         // areaType发生变化的时候需要把SelectedItem组件重置
         if(orgData.areaType !== tableFormData.areaType){
@@ -87,14 +89,16 @@ export default class OnlineRateMulti extends React.Component{
             })
             return
         }
+        let formSelected = this.state.selected.concat();
         this.setState({
-            chartFormData
+            chartFormData,
+            formSelected
         })
     }
 
     render() {
 
-        let { areaType,tableFormData,chartFormData,ifShowAlert,selected } = this.state;
+        let { areaType,tableFormData,chartFormData,formSelected,ifShowAlert,selected } = this.state;
         let formAreaType = tableFormData ? tableFormData.areaType : null;
         let ifProvinceVisible = areaType === '市'
         let ifCityVisible = false;
@@ -151,13 +155,23 @@ export default class OnlineRateMulti extends React.Component{
                         }} />
                     </div>
                 }
+                {
+                    formAreaType === '市' &&
+                    <div className='chart-box'>
+                        <SelectTable ref={this.tableWrapperRef} handleClickAddBtn={this.handleClickAddBtn} render={(onChangeFn)=>{
+                            return (
+                                <CityTable actionRef={this.tableRef} formData={tableFormData} onSelect={onChangeFn}/>
+                            )
+                        }} />
+                    </div>
+                }
 
                 <div className='chart-box'>
                     { selected.length>0 && <SelectTableItem selected={selected} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
                     <SearchForm initialValues={{ unit: '天' }} onFinish={this.onFinishChartForm}>
                         <div className="searchForm-row">
                             <TimeRangeSelector required={true}/>
-                            <TimeUnitSelector/>
+                            <TimeUnitSelector required={true}/>
                         </div>
                         <div className="searchForm-row">
                             <Form.Item
@@ -176,7 +190,7 @@ export default class OnlineRateMulti extends React.Component{
                     { (ifShowAlert&&selected.length===0) && <Alert message="请选择至少一个对象" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <OnlineRateMultiChart selected={selected}/> }
+                    { chartFormData===null ? <NoChart/> : <OnlineRateMultiChart selected={formSelected} query={chartFormData}/> }
                 </div>
             </PageLayout>
         )

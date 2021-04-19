@@ -1,0 +1,32 @@
+@import "../../../theme";
+
+.project-detail-page{
+  .project-name{
+    color: @main;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 36px;
+    margin-bottom: 0px;
+  }
+  .project-info-box{
+    display: flex;
+    justify-content: left;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    .project-info-item{
+      width: 25vw;
+      line-height: 36px;
+      font-size: 14px;
+      height: 36px;
+      overflow:hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      -o-text-overflow:ellipsis;
+      .project-info-label{
+        color: #7A8392;
+        width: 100px;
+      }
+    }
+  }
+
+}

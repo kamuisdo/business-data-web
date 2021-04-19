@@ -11,21 +11,12 @@ class LcLinkCount extends React.Component{
         this.instance = null;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot){
-        let series = this.updateSeries();
-        let option = {
-            series: series
-        }
-        this.instance.setOption(option);
-    }
-
 
     componentDidMount() {
         let { initEcharts,getOptionWithDefault } = this.props;
         let chartDom = document.getElementById('LcLinkCountChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
-        let series = this.updateSeries();
         let option = getOptionWithDefault({
             title:{
                 text:'每个LCNo连接的系统数'
@@ -65,15 +56,23 @@ class LcLinkCount extends React.Component{
             },
 
             color:['#2B6AFF','#F759AA','#FEAEDB','#FBD237','#94DFF3','#965DE7','#4ADE63'],
-            series: series
+            series: []
         })
         myChart.setOption(option);
+        this.loadData()
+    }
 
+    loadData(){
+        let {query,requestFn} = this.props;
+        return requestFn(this.instance,query).then((data)=>{
+            this.updateSeries(data)
+        })
     }
 
     // 设置line的参数
-    updateSeries(){
-        return [
+    updateSeries(data){
+        let {getDefaultSeriesOpt} = this.props;
+        let series = [
             {
                 name:'Lc No 连接数',
                 type:'pie',
@@ -102,6 +101,8 @@ class LcLinkCount extends React.Component{
                 ]
             },
         ]
+
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {
@@ -119,7 +120,7 @@ class LcLinkCount extends React.Component{
     }
 }
 
-export default class LcLinkCountChart extends React.Component{
+export default class LcLinkCountChart extends React.PureComponent{
 
     render() {
         let LcLinkCountChart = withEcharts(LcLinkCount)

@@ -1,6 +1,7 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
-import projectType from "../../../enum/projectType";
+import {ProjectTypeEnum} from "../../../enum/projectType";
+
 
 class ProjectTypeCount extends React.Component{
 
@@ -23,7 +24,6 @@ class ProjectTypeCount extends React.Component{
         let chartDom = document.getElementById('ProjectTypeCountChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
-        let series = this.updateSeries();
         let option = getOptionWithDefault({
             grid:{
                 // 使得图表撑满整个div
@@ -49,21 +49,31 @@ class ProjectTypeCount extends React.Component{
             ],
             xAxis: {
                 type: 'category',
-                data:projectType,
+                data:ProjectTypeEnum.toArray(),
                 axisLabel: { interval: 0, rotate: 30 },
                 boundaryGap: false
             },
-            series: series
+            series: []
         })
         myChart.setOption(option);
 
+        this.loadData()
+
+    }
+
+    loadData(){
+        let {query,requestFn} = this.props;
+        return requestFn(this.instance,query).then((data)=>{
+            this.updateSeries(data)
+        })
     }
 
     // 设置line的参数
-    updateSeries(){
+    updateSeries(data){
         let projectData = [69,130,12,115,586,3,150,65,122,58,40,51,20]
         let sysData = [350,438,39,578,3561,43,936,761,1081,378,269,71,57]
-        return [
+        let {getDefaultSeriesOpt} = this.props;
+        let series = [
             {
                 name:'物件数',
                 type:'bar',
@@ -86,6 +96,7 @@ class ProjectTypeCount extends React.Component{
                 data:sysData
             }
         ]
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {
@@ -93,7 +104,7 @@ class ProjectTypeCount extends React.Component{
     }
 }
 
-export default class ProjectTypeCountChart extends React.Component{
+export default class ProjectTypeCountChart extends React.PureComponent{
 
     render() {
         let ProjectTypeCountChart = withEcharts(ProjectTypeCount)

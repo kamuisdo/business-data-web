@@ -15,6 +15,8 @@ export default class SelectTable extends React.Component{
             totalSelected:[]    // 表格中累计被选中的
         }
         this.onSelectedChange = this.onSelectedChange.bind(this)
+        this.resetTotal = this.resetTotal.bind(this)
+        this.resetCurrent = this.resetCurrent.bind(this)
     }
 
     // 被render函数传入子组件
@@ -35,9 +37,15 @@ export default class SelectTable extends React.Component{
         })
     }
 
-    reset(){
+    resetTotal(selected=[]){
         this.setState({
-            currentPageSelected:[]
+            totalSelected:selected
+        })
+    }
+
+    resetCurrent(selected=[]){
+        this.setState({
+            currentPageSelected:selected
         })
     }
 

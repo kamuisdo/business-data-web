@@ -11,21 +11,12 @@ class HpCount extends React.Component{
         this.instance = null;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot){
-        let series = this.updateSeries();
-        let option = {
-            series: series
-        }
-        this.instance.setOption(option);
-    }
-
 
     componentDidMount() {
         let { initEcharts,getOptionWithDefault } = this.props;
         let chartDom = document.getElementById('HpCountChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
-        let series = this.updateSeries();
         let option = getOptionWithDefault({
             grid:{
                 // 使得图表撑满整个div
@@ -48,25 +39,33 @@ class HpCount extends React.Component{
                 data:[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
                 boundaryGap: false
             },
-            series: series
+            series: []
         })
         myChart.setOption(option);
 
+        this.loadData()
+    }
+
+    loadData(){
+        let {query,requestFn} = this.props;
+        return requestFn(this.instance,query).then((data)=>{
+            this.updateSeries(data)
+        })
     }
 
     // 设置line的参数
-    updateSeries(){
-        let data = [69,130,122,115,586,312,150,65,122,58,40,51,20,123,45,234,567]
-        return [
-            {
-                type:'bar',
-                yAxisIndex:0,
-                itemStyle: {
-                    color: '#2B6AFF',
-                },
-                data:data
+    updateSeries(data){
+        data = [69,130,122,115,586,312,150,65,122,58,40,51,20,123,45,234,567]
+        let {getDefaultSeriesOpt} = this.props;
+        let series = [{
+            type:'bar',
+            yAxisIndex:0,
+            itemStyle: {
+                color: '#2B6AFF',
             },
-        ]
+            data:data
+        }]
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {
@@ -74,7 +73,7 @@ class HpCount extends React.Component{
     }
 }
 
-export default class HpCountChart extends React.Component{
+export default class HpCountChart extends React.PureComponent{
 
     render() {
         let HpCountChart = withEcharts(HpCount)

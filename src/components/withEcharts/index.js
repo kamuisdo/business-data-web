@@ -1,10 +1,10 @@
 import React from 'react';
 import * as echarts from "echarts";
-import {Button} from 'antd'
 import deepmerge from "deepmerge";
 import isArray from 'lodash/isArray'
 import isPlainObject from 'lodash/isPlainObject'
 import ErrorChart from "../ErrorChart";
+import chartColor from "../../enum/chartColor";
 
 function getDisplayName(WrappedComponent) {
     return WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -37,6 +37,7 @@ export default function withEcharts(WrappedComponent){
             this.chartResize = this.chartResize.bind(this);
             this.getOptionWithDefault = this.getOptionWithDefault.bind(this)
             this.initEcharts = this.initEcharts.bind(this)
+            this.getDefaultSeriesOpt = this.getDefaultSeriesOpt.bind(this)
             this.state = {
                 ifError:false
             }
@@ -78,6 +79,7 @@ export default function withEcharts(WrappedComponent){
         getOptionWithDefault(opt={}){
 
             let defaultOpt = {
+                color:chartColor,
                 grid:{
                     // 使得图表撑满整个div
                     top:"80px",
@@ -119,8 +121,49 @@ export default function withEcharts(WrappedComponent){
                         type:'dashed',
                         opacity:0.8
                     }
+                },
+                axisLine:{
+                    show: true,
+                    lineStyle:{
+                        color:['#E5E9ED']
+                    }
+                },
+                axisLabel: {
+                    show: true,
+                    color: "#1B253A"
+                },
+                nameTextStyle: {
+                    color: "#1B253A"
                 }
             }
+
+            let xAxisDefaultOpt = {
+                axisLine:{
+                    lineStyle:{
+                        color:['#E5E9ED']
+                    }
+                },
+                axisLabel: {
+                    show: true,
+                    color: "#1B253A",
+                    padding: [5, 0, 0, 0]
+                },
+                nameTextStyle: {
+                    color: "#1B253A"
+                }
+            }
+
+            // 先把最外层没有数组的合并掉
+            let commonMerged = deepmerge(defaultOpt,opt)
+            // 合并Y轴设置
+            commonMerged.yAxis = myMerge(commonMerged.yAxis,yAxisDefaultOpt)
+            commonMerged.xAxis = myMerge(commonMerged.xAxis,xAxisDefaultOpt)
+
+            return commonMerged
+        }
+
+        // 获取默认的series设置
+        getDefaultSeriesOpt(option){
             // 柱状图默认设置
             let barSeriesDefaultOpt = {
                 itemStyle: {
@@ -133,15 +176,16 @@ export default function withEcharts(WrappedComponent){
                 symbolSize:7,
                 lineStyle:{
                     width: 1
+                },
+                emphasis: {
+                    focus: 'series',
+                    blurScope: 'coordinateSystem'
                 }
             }
-            // 先把最外层没有数组的合并掉
-            let commonMerged = deepmerge(defaultOpt,opt)
-            // 合并Y轴设置
-            commonMerged.yAxis = myMerge(commonMerged.yAxis,yAxisDefaultOpt)
+
             // 合并图表设置
-            if(commonMerged.series && commonMerged.series.length>0){
-                commonMerged.series = commonMerged.series.map((seriesItem)=>{
+            if(option.series && option.series.length>0){
+                option.series = option.series.map((seriesItem)=>{
                     if(seriesItem.type === 'bar'){
                         return deepmerge(barSeriesDefaultOpt,seriesItem)
                     }
@@ -152,12 +196,24 @@ export default function withEcharts(WrappedComponent){
                 })
             }
 
-            return commonMerged
+            return option
         }
 
         // echarts实例化
         initEcharts(dom,theme=null,opt={locale:'ZH'}){
-            return echarts.init(dom,theme,opt)
+            let chart = echarts.init(dom,theme,opt);
+            let resized = false;
+            // 用于解决有些chart初始宽度无法正确取得
+            chart.on('rendered',()=>{
+                if(!resized){
+                    let domWidth = chart.getDom().offsetWidth;
+                    if(domWidth !== chart.getWidth()){
+                        chart.resize()
+                        resized = true
+                    }
+                }
+            })
+            return chart
         }
 
 
@@ -210,6 +266,7 @@ export default function withEcharts(WrappedComponent){
             return this.state.ifError ? errorNode : <WrappedComponent {...rest}
                                                                       requestFn={tempFn}
                                                                       initEcharts={this.initEcharts}
+                                                                      getDefaultSeriesOpt={this.getDefaultSeriesOpt}
                                                                       getOptionWithDefault={this.getOptionWithDefault}
                                                                       ref={this.instanceRef}/>
         }

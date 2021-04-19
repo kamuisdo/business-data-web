@@ -17,12 +17,6 @@ class EnergyBar extends React.Component{
             title:{
                 text:'电力消耗可视化报表'
             },
-            // legend:{
-            //     left:'center'
-            // },
-            // tooltip:{
-            //   formatter:'{b0}: {c0}<br />{b1}: {c1}'
-            // },
             yAxis: [
                 {
                     type: 'value',
@@ -59,6 +53,7 @@ class EnergyBar extends React.Component{
     // 设置line的参数
     updateSeries(seriesData){
         let { warm,cold,temper } = seriesData;
+        let {getDefaultSeriesOpt} = this.props;
         let series = [
             {
                 name:'暖房',
@@ -66,8 +61,10 @@ class EnergyBar extends React.Component{
                 yAxisIndex:0,
                 itemStyle: {
                     color: '#FD507C',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    opacity:0.5
                 },
+                barGap:'-100%',
                 barWidth:2,
                 data:warm
             },
@@ -77,7 +74,8 @@ class EnergyBar extends React.Component{
                 yAxisIndex:0,
                 itemStyle: {
                     color: '#2B6AFF',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    opacity:0.5
                 },
                 barWidth:2,
                 data:cold
@@ -96,7 +94,7 @@ class EnergyBar extends React.Component{
                 data:temper
             }
         ]
-        this.instance.setOption({ series })
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {
@@ -104,7 +102,7 @@ class EnergyBar extends React.Component{
     }
 }
 
-export default class EnergyBarChart extends React.Component{
+export default class EnergyBarChart extends React.PureComponent{
 
     render() {
         let EnergyBarChart = withEcharts(EnergyBar)

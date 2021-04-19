@@ -23,43 +23,47 @@ export default class ProjectCascadeSelector extends React.Component{
     }
 
     render() {
-        let { areaRules,provinceRules,cityRules,projectRules,projectTypeRules,lcNoRules,systemRules } = this.props;
+        let { areaRules,provinceRules,cityRules,projectRules,projectTypeRules,lcNoRules,systemRules,innerRules,hideFrom } = this.props;
+        let ifHideProject = hideFrom === '物件'
+        let ifHideLcNo = ['物件','LcNo'].indexOf(hideFrom) >= 0
+        let ifHideSystem = ['物件','LcNo','系统'].indexOf(hideFrom) >= 0
+        let ifHideInner = ['物件','LcNo','系统','内机'].indexOf(hideFrom) >= 0
         return (
             <>
                 <div className="searchForm-row">
                     <Form.Item
                         label="地区"
-                        name="area"
+                        name="regionCode"
                         rules={areaRules}
                     >
                         <ApiSelect
                             placeholder="请选择地区"
                             ref={this.areaRef}
                             requestFn={api.getRegionInfo}
-                            textField="regionName"
-                            valueField="regionCode"
+                            textField="text"
+                            valueField="value"
                             cascadeBy={[this.provinceRef]}
                         />
                     </Form.Item>
                     <Form.Item
                         label="省"
-                        name="province"
+                        name="provinceCode"
                         rules={provinceRules}
                     >
                         <ApiSelect
                             placeholder="请选择省份"
                             ref={this.provinceRef}
                             requestFn={api.getProvinceInfo}
-                            textField="provinceName"
-                            valueField="provinceCode"
+                            textField="text"
+                            valueField="value"
                             cascadeBy={[this.cityRef]}
-                            cascading={true}
-                            cascadeParams={(value)=>{ return{ region:value } }}
+                            cascading={this.areaRef}
+                            cascadeParams={(value)=>{ return {regionCode:value} }}
                         />
                     </Form.Item>
                     <Form.Item
                         label="市"
-                        name="city"
+                        name="cityCode"
                         rules={cityRules}
                     >
                         <ApiSelect
@@ -67,15 +71,16 @@ export default class ProjectCascadeSelector extends React.Component{
                             showSearch={true}
                             ref={this.cityRef}
                             requestFn={api.getCityInfo}
-                            textField="cityName"
-                            valueField="cityCode"
-                            cascading={true}
-                            cascadeParams={(value)=>{ return{ province:value } }}
+                            textField="text"
+                            valueField="value"
+                            cascadeBy={[this.projectTypeRef]}
+                            cascading={this.provinceRef}
+                            cascadeParams={(value)=>{ return {provinceCode:value} }}
                         />
                     </Form.Item>
                     <Form.Item
                         label="物件类型"
-                        name="projectType"
+                        name="buildingType"
                         rules={projectTypeRules}
                     >
                         <ApiSelect
@@ -83,74 +88,104 @@ export default class ProjectCascadeSelector extends React.Component{
                             showSearch={true}
                             ref={this.projectTypeRef}
                             requestFn={api.getProjectType}
+                            cascading={this.cityRef}
                             cascadeBy={[this.projectRef]}
-                            textField="name"
-                            valueField="value"
+                            textField="value"
+                            valueField="id"
                         />
                     </Form.Item>
                 </div>
 
                 <div className="searchForm-row">
-                    <Form.Item
-                        label="物件"
-                        name="project"
-                        rules={projectRules}
-                    >
-                        <ApiSelect
-                            placeholder="请选择物件"
-                            showSearch={true}
-                            ref={this.projectRef}
-                            requestFn={api.getProjectType}
-                            textField="name"
-                            valueField="value"
-                            cascading={true}
-                            cascadeParams={(value)=>{
-                                // 获取之前几个的值作为搜索条件
-                                return {
-                                    region:this.areaRef.current.state.value,
-                                    province:this.provinceRef.current.state.value,
-                                    city:this.cityRef.current.state.value,
-                                    projectType:value
-                                }
-                            }}
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        label="LCNo"
-                        name="lcNo"
-                        rules={lcNoRules}
-                    >
-                        <ApiSelect
-                            placeholder="请选择LCNo"
-                            showSearch={true}
-                            ref={this.lcNoRef}
-                            requestFn={api.getProjectType}
-                            textField="name"
-                            valueField="value"
-                            cascading={true}
-                            cascadeParams={(value)=>{
-                                return { project:value }
-                            }}
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        label="系统"
-                        name="system"
-                        rules={systemRules}
-                    >
-                        <ApiSelect
-                            placeholder="请选择系统"
-                            showSearch={true}
-                            ref={this.systemRef}
-                            requestFn={api.getProjectType}
-                            textField="name"
-                            valueField="value"
-                            cascading={true}
-                            cascadeParams={(value)=>{
-                                return { lcNo:value }
-                            }}
-                        />
-                    </Form.Item>
+                    {
+                        !ifHideProject && <Form.Item
+                            label="物件"
+                            name="buildingId"
+                            rules={projectRules}
+                        >
+                            <ApiSelect
+                                placeholder="请选择物件"
+                                showSearch={true}
+                                ref={this.projectRef}
+                                requestFn={api.getProjectList}
+                                textField="buildingName"
+                                valueField="buildingId"
+                                cascadeBy={[this.lcNoRef]}
+                                cascading={this.projectTypeRef}
+                                cascadeParams={(value)=>{
+                                    // 获取之前几个的值作为搜索条件
+                                    return {
+                                        regionCode:this.areaRef.current.state.value,
+                                        provinceCode:this.provinceRef.current.state.value,
+                                        cityCode:this.cityRef.current.state.value,
+                                        projectType:value
+                                    }
+                                }}
+                            />
+                        </Form.Item>
+                    }
+                    {
+                        !ifHideLcNo && <Form.Item
+                            label="LCNo"
+                            name="terminalId"
+                            rules={lcNoRules}
+                        >
+                            <ApiSelect
+                                placeholder="请选择LCNo"
+                                showSearch={true}
+                                ref={this.lcNoRef}
+                                requestFn={api.getLcNoList}
+                                textField="lcNo"
+                                valueField="terminalId"
+                                cascadeBy={[this.systemRef]}
+                                cascading={this.projectRef}
+                                cascadeParams={(value)=>{
+                                    return { buildingId:value }
+                                }}
+                            />
+                        </Form.Item>
+                    }
+                    {
+                        !ifHideSystem && <Form.Item
+                            label="系统"
+                            name="lineId"
+                            rules={systemRules}
+                        >
+                            <ApiSelect
+                                placeholder="请选择系统"
+                                showSearch={true}
+                                ref={this.systemRef}
+                                requestFn={api.getSystemList}
+                                textField="lineName"
+                                valueField="lineId"
+                                cascading={this.lcNoRef}
+                                cascadeParams={(value)=>{
+                                    return { terminalId:value }
+                                }}
+                            />
+                        </Form.Item>
+                    }
+                    {
+                        !ifHideInner && <Form.Item
+                            label="内机"
+                            name="unitId"
+                            rules={innerRules}
+                        >
+                            <ApiSelect
+                                placeholder="请选择室内机"
+                                showSearch={true}
+                                ref={this.innerRef}
+                                requestFn={api.getInnerList}
+                                textField="modelTypeId"
+                                valueField="unitId"
+                                cascading={this.systemRef}
+                                cascadeParams={(value)=>{
+                                    return { lineId:value }
+                                }}
+                            />
+                        </Form.Item>
+                    }
+
                 </div>
 
             </>
@@ -166,7 +201,9 @@ ProjectCascadeSelector.propTypes = {
     projectTypeRules:PropTypes.array,
     projectRules:PropTypes.array,
     lcNoRules:PropTypes.array,
-    systemRules:PropTypes.array
+    systemRules:PropTypes.array,
+    innerRules:PropTypes.array,
+    hideFrom:PropTypes.string
 }
 
 ProjectCascadeSelector.defaultProps = {
@@ -176,6 +213,8 @@ ProjectCascadeSelector.defaultProps = {
     projectTypeRules:[{ required:true }],
     projectRules:[{ required:true }],
     lcNoRules:[],
-    systemRules:[]
+    systemRules:[],
+    innerRules:[],
+    hideFrom:'内机'
 }
 

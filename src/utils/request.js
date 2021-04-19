@@ -1,5 +1,5 @@
 import axios from "axios";
-import Api from "../api/api";
+import { notification } from 'antd';
 
 let defaultConfig = {
     timeout:100000,
@@ -36,6 +36,21 @@ function getApiCommandType(url){
     return 'read'
 }
 
+// 请求失败的通知
+function errorNotification(resOrErr){
+    notification.open({
+        message: '数据请求失败',
+        description:'温馨提示：因为服务器问题，暂时无法请求到数据。若需查看数据，可以进行刷新或稍后重试',
+        className: 'error-notification',
+        style: {
+            width: 450,
+        },
+        // duration:null
+    });
+    // 默认将错误继续抛出
+    throw new Error(resOrErr)
+}
+
 /**
  * 返回暴露给试图层调用的方法
  */
@@ -60,6 +75,9 @@ export default function requestFactory(apiOpt={}){
 
     let host = process.env[apiOpt.hostType];
 
+    // console.log(apiOpt.hostType)
+    // console.log(host)
+
     return function (data={},requestOpt={}){
         let dataKey = method === 'get' ? 'params' : 'data';
         let axiosConfig = Object.assign(defaultConfig,apiOpt,requestOpt,{
@@ -69,14 +87,14 @@ export default function requestFactory(apiOpt={}){
             [dataKey]:data
         })
         return axios.request(axiosConfig).then((res)=>{
-            let ifError = res.data.error;
+            let ifError = res.data.code !== 0;
             if(ifError){
                 //TODO 此处可加入默认的发生错误时的副作用
-
-                // 默认将错误继续抛出
-                throw new Error(res.data.message)
+                errorNotification(res)
             }
             return res.data.data
+        }).catch((err)=>{
+            errorNotification(err)
         })
     }
 }

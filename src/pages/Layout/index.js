@@ -91,12 +91,12 @@ export default class PageLayout extends React.Component {
                         <Menu.Item key="air-quality" icon={<img className="menuIcon" src={aq_icon} />}>
                             <Link to="/air-quality" >空气质量</Link>
                         </Menu.Item>
-                        <Menu.Item key="query" icon={<img className="menuIcon" src={search_icon} />}>
-                            <Link to="/query" >物件查询</Link>
+                        <Menu.Item key="project-query" icon={<img className="menuIcon" src={search_icon} />}>
+                            <Link to="/project-query" >物件查询</Link>
                         </Menu.Item>
-                        <Menu.Item key="demo" icon={<img className="menuIcon" src={overview_icon} />}>
-                            <Link to="/demo" >demo页</Link>
-                        </Menu.Item>
+                        {/*<Menu.Item key="demo" icon={<img className="menuIcon" src={overview_icon} />}>*/}
+                        {/*    <Link to="/demo" >demo页</Link>*/}
+                        {/*</Menu.Item>*/}
 
                     </Menu>
                 </Sider>

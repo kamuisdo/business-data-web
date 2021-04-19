@@ -1,5 +1,5 @@
 import React from "react";
-import src from '../../assets/暂无数据@2x.png'
+import src from '../../assets/系统繁忙@2x.png'
 import {Button} from 'antd'
 
 export default class ErrorChart extends React.Component{

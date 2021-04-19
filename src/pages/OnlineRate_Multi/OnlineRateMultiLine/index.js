@@ -30,16 +30,24 @@ class OnlineRateMulti extends React.Component{
             title:{
                 text:'在线率统计'
             },
-            // tooltip: {
-            //     trigger: 'axis'
-            // },
-            // tooltip:{
-            //     formatter:'匹数为{b}(hp)的数量：{c}'
-            // },
+            tooltip:{
+                formatter:function(params){
+                    // console.log(params);
+                    params = params[0]
+                    let value = params.value[1]
+                    let date = params.value[0];
+                    return `${params.seriesName}<br/><span>${params.marker}${date}：${Math.floor(value*100)}%</span>`
+                }
+            },
             yAxis: {
                 name:'在线率',
                 type: 'value',
                 boundaryGap: false,
+                axisLabel:{
+                    formatter:function (value, index) {
+                        return Math.floor(value*100) + '%';
+                    }
+                }
             },
             xAxis: {
                 type: 'time',
@@ -55,13 +63,13 @@ class OnlineRateMulti extends React.Component{
 
     // 设置line的参数
     updateSeries(){
-        let { selected } = this.props
+        let { selected,query } = this.props
         this.instance.showLoading()
-        onlineRateMultiLine({selected}).then((data)=>{
+        onlineRateMultiLine(Object.assign({selected},query)).then((data)=>{
             let series = data.map((data,index)=>{
                 return {
                     type:'line',
-                    name:index,
+                    name:index+1,
                     showSymbol:false,
                     smooth:true,
                     data:data
@@ -77,7 +85,7 @@ class OnlineRateMulti extends React.Component{
     }
 }
 
-export default class OnlineRateMultiChart extends React.Component{
+export default class OnlineRateMultiChart extends React.PureComponent{
 
     render() {
         let OnlineRateMultiChart = withEcharts(OnlineRateMulti)

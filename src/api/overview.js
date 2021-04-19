@@ -6,9 +6,15 @@ const onlineCountLine = requestFactory({ url:'post/overview/onlineCountLine',hos
 
 const chinaMapCount = requestFactory({ url:'post/overview/chinaMapCount',hostType:'REACT_APP_MOCK_HOST',mockUrl:'post/overview/chinaMapCount' })
 
+const getProjectTypeChart = requestFactory({
+    url:'',
+    hostType:'REACT_APP_MOCK_HOST',
+    mockUrl:'post/overview/getProjectTypeChart'
+})
 
 export {
     chinaMap,
     chinaMapCount,
-    onlineCountLine
+    onlineCountLine,
+    getProjectTypeChart
 }

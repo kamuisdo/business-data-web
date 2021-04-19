@@ -1,4 +1,4 @@
-import { isKeyValue } from '../common/utils'
+import isPlainObject from 'lodash/isPlainObject'
 
 /**
  * 配置对象
@@ -8,7 +8,6 @@ import { isKeyValue } from '../common/utils'
  * id & value & key is required
  */
 class ObjectValue{
-  //TODO: add opt
   constructor(id,value,key,attr) {
     if(new.target === 'ObjectValue'){
       throw new Error('ObjectValue Error: ObjectValue can not be new directly')
@@ -22,7 +21,7 @@ class ObjectValue{
     if(key === undefined){
       throw new Error('ObjectValue Error: key required')
     }
-    if(attr && !isKeyValue(attr)){
+    if(attr && !isPlainObject(attr)){
       throw new Error('ObjectValue Error: attr required json')
     }
     this.id = id;
@@ -44,14 +43,14 @@ let _attr = Symbol('_attr');
 class ObjectValueCollection {
   constructor(){
     if(new.target === 'ObjectValue'){
-      throw new InnerError({message:'ObjectValueCollection Error: ObjectValueCollection can not be new directly'})
+      throw new Error('ObjectValueCollection Error: ObjectValueCollection can not be new directly')
     }
     this[_attr] = {}
   }
 
   add(object){
     if(!object instanceof ObjectValue){
-      throw new InnerError({message:'ObjectValueCollection Error: add function required ObjectValue instance'})
+      throw new Error('ObjectValueCollection Error: add function required ObjectValue instance')
     }
     let key = object.key;
     this[_attr][key] = object

@@ -16,6 +16,7 @@ export default class SelectTableItem extends React.Component{
 
     formatSelected(){
         let {selected=[],nameField="key"} = this.props
+        console.log(nameField);
         if(selected.length>1){
             return uniqBy(selected,nameField)
         }
@@ -25,13 +26,14 @@ export default class SelectTableItem extends React.Component{
     render() {
         let {nameField="key"} = this.props
         let selected = this.formatSelected();
+        console.log(selected);
         return (
             <div className="select-table-item-box">
                 {
-                    selected.map((v)=>{
+                    selected.map((v,index)=>{
                         return (
-                            <div key={v.key} className="select-table-item-item">
-                                <span>{v[nameField]}</span>
+                            <div key={index} className="select-table-item-item">
+                                <span>({index+1}){v[nameField]}</span>
                                 <span className="select-table-item-remove" onClick={this.onRemoveItem.bind(this,v.key)}><CloseOutlined style={{ color:"#999",fontSize:'12px' }}/></span>
                             </div>
                         )

@@ -11,8 +11,7 @@ const { Option } = Select;
 class ChinaMap extends React.Component{
     constructor(props) {
         super(props);
-        // this.instance = null;
-        console.log('------ ChinaMap constructor ------')
+        this.instance = null;
     }
 
     componentDidMount() {
@@ -20,8 +19,6 @@ class ChinaMap extends React.Component{
         let chartDom = document.getElementById('chinaMapChart');
         let myChart = echarts.init(chartDom);
         this.instance = myChart;
-        console.log('------ ChinaMap componentDidMount ------')
-        console.log(this.instance)
         let option;
         option = {
             title:{
@@ -49,15 +46,6 @@ class ChinaMap extends React.Component{
         option && myChart.setOption(option);
         this.loadData()
 
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log('---- ChinaMap componentDidUpdate ------')
-        console.log(prevProps.unit)
-        console.log(this.props.unit)
-        if(prevProps.unit && (prevProps.unit !== this.props.unit)){
-            this.loadData()
-        }
     }
 
     loadData(){

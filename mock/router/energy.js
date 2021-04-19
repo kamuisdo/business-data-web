@@ -3,7 +3,7 @@ let router = express.Router()
 let utils = require('../utils')
 
 /**
- * 获取物件类型
+ * 单物件电力柱状图
  */
 router.post('/getEnergyBarChart',(req,res,next)=>{
     res.locals.data = {
@@ -14,6 +14,41 @@ router.post('/getEnergyBarChart',(req,res,next)=>{
 
     next()
 })
+
+/**
+ * 单物件电力ErrDay
+ */
+router.post('/getEnergyErrLine',(req,res,next)=>{
+    res.locals.data = utils.createRandomData(0,5)
+
+    next()
+})
+
+/**
+ * 多物件耗电量
+ */
+router.post('/getEnergyMultiLine',(req,res,next)=>{
+
+    res.locals.data = req.body.selected.map(()=>{
+        return utils.createRandomData(0,1.9)
+    })
+
+    next()
+})
+
+/**
+ * 多物件错误率
+ */
+router.post('/getEnergyErrorMultiLine',(req,res,next)=>{
+
+    res.locals.data = req.body.selected.map(()=>{
+        return utils.createRandomData(0,1.9)
+    })
+
+    next()
+})
+
+
 
 
 

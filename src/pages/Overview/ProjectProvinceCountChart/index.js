@@ -1,6 +1,5 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
-import projectType from "../../../enum/projectType";
 
 class ProjectProvinceCount extends React.Component{
 
@@ -23,7 +22,6 @@ class ProjectProvinceCount extends React.Component{
         let chartDom = document.getElementById('ProjectProvinceCountChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
-        let series = this.updateSeries();
         let option = getOptionWithDefault({
             title:{
                 text:'各地物件数排名'
@@ -54,18 +52,26 @@ class ProjectProvinceCount extends React.Component{
                 data:['上海','江苏','安徽','浙江'],
                 boundaryGap: false
             },
-            series: series
+            series: []
         })
         myChart.setOption(option);
+        this.loadData()
+    }
 
+    loadData(){
+        let {query,requestFn} = this.props;
+        return requestFn(this.instance,query).then((data)=>{
+            this.updateSeries(data)
+        })
     }
 
     // 设置line的参数
-    updateSeries(){
+    updateSeries(data){
+        let {getDefaultSeriesOpt} = this.props;
         let projectData = [69,130,46,115]
         let lastProjectData = [65,131,12,110]
         let rateData = [0.13,0.22,0.53,0.08];
-        return [
+        let series = [
             {
                 name:'物件数',
                 type:'bar',
@@ -97,6 +103,7 @@ class ProjectProvinceCount extends React.Component{
                 data:rateData
             }
         ]
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {
@@ -104,7 +111,7 @@ class ProjectProvinceCount extends React.Component{
     }
 }
 
-export default class ProjectProvinceCountChart extends React.Component{
+export default class ProjectProvinceCountChart extends React.PureComponent{
 
     render() {
         let ProjectProvinceCountChart = withEcharts(ProjectProvinceCount)

@@ -28,11 +28,6 @@ export default class OverviewPage extends React.Component{
         this.handleSearch = this.handleSearch.bind(this)
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log('---- OverviewPage componentDidUpdate ------')
-    }
-
-
     handleClickSearchFormBtn(){
         this.setState({
             searchShow:!this.state.searchShow
@@ -75,29 +70,29 @@ export default class OverviewPage extends React.Component{
                         </div>
                     </div>
                     <div className="chart-box">
-                            <OnlineCountChart requestFn={api.onlineCountLine} query={formData} />
+                        <OnlineCountChart requestFn={api.onlineCountLine} query={formData} />
                     </div>
                     <div style={{clear: 'both'}}>
                         <div className="chart-box" style={{ width:'calc((100% - 20px)/2)',marginRight:'20px',float:'left' }}>
                             <Collapse title="物件类型概况">
-                                <ProjectTypeCountChart/>
+                                <ProjectTypeCountChart requestFn={api.getProjectTypeChart} query={formData}/>
                             </Collapse>
                         </div>
                         <div className="chart-box" style={{ width:'calc((100% - 20px)/2)',float:'left' }}>
                             <Collapse title="智能VRV匹数分析">
-                                <HpCountChart/>
+                                <HpCountChart requestFn={api.getProjectTypeChart} query={formData}/>
                             </Collapse>
                         </div>
                     </div>
                     <div style={{clear: 'both'}}>
                         <div className="chart-box" style={{ width:'calc((100% - 20px)/2)',marginRight:'20px',float:'left' }}>
                             <Collapse title="每个LCNo连接的系统数">
-                                <LcLinkCountChart/>
+                                <LcLinkCountChart requestFn={api.getProjectTypeChart} query={formData}/>
                             </Collapse>
                         </div>
                         <div className="chart-box" style={{ width:'calc((100% - 20px)/2)',float:'left' }}>
                             <Collapse title="各地物件数排名">
-                                <ProjectProvinceCountChart/>
+                                <ProjectProvinceCountChart requestFn={api.getProjectTypeChart} query={formData}/>
                             </Collapse>
                         </div>
                     </div>

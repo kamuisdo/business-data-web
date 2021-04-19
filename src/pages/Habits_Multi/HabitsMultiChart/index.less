@@ -1,0 +1,43 @@
+.habits-multi-box{
+  display: flex;
+  justify-content: left;
+  .legend-item-row{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    .legend-item{
+      color: #7A8392;
+      font-size: 14px;
+      cursor: pointer;
+      width: 10vw;
+      display: flex;
+      justify-content: left;
+      align-items: center;
+    }
+    .legend-item-point{
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 10px;
+      display: block;
+    }
+    .legend-item-disabled{
+      color: #b3b3b3;
+      .legend-item-point{
+        background-color: #b3b3b3 !important;
+      }
+    }
+  }
+  .legend-item-box{
+    max-height: 300px;
+    overflow: scroll;
+  }
+  .checkbox-row{
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+  }
+  .checkbox-row>div{
+    width: 10vw;
+  }
+}

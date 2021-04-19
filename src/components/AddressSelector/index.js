@@ -37,7 +37,7 @@ export default class AddressSelector extends React.Component{
         let {fieldName,labelText,onChange} = this.props;
         return (
             <>
-                <Form.Item name="Province" label="省">
+                <Form.Item name="provinceCode" label="省">
                     {/*<Cascader onChange={onChange} />*/}
                     <Select
                         style={{width:180}}
@@ -52,7 +52,7 @@ export default class AddressSelector extends React.Component{
                         <Option value="广东省">广东省</Option>
                     </Select>
                 </Form.Item>
-                <Form.Item name="City" label="市">
+                <Form.Item name="cityCode" label="市">
                     <Select
                         style={{width:180}}
                         placeholder="请选择市"

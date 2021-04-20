@@ -3,6 +3,7 @@ import withEcharts from "../../../components/withEcharts";
 import chartColor from "../../../enum/chartColor";
 import PropTypes from 'prop-types'
 import ErrorChart from "../../../components/ErrorChart";
+import dayjs from 'dayjs'
 
 class Air extends React.Component{
 
@@ -39,7 +40,7 @@ class Air extends React.Component{
             },
             tooltip: {
                 formatter: (params)=>{
-                    let date = params[0].axisValueLabel;
+                    let date = dayjs(params[0].axisValueLabel).format('YYYY/MM/DD');
                     let unitText = that.props.unitText;
                     let itemDom = params.map((v)=>{
                         let {seriesName,marker,data} = v

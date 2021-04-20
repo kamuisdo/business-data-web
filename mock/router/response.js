@@ -2,6 +2,7 @@ module.exports = function (req,res){
     let data = res.locals.data;
     let type = res.locals.type;
     let error = !!res.locals.error;
+    let code = error ? -1 : 0;
     if(type === 'pageable'){
         data = {
             list:data,
@@ -14,7 +15,7 @@ module.exports = function (req,res){
         }
     }
     let resData = {
-        error,
+        code,
         data
     }
     setTimeout(()=>{

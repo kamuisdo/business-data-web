@@ -52,6 +52,7 @@ class EnergyLineMulti extends React.Component{
     loadData(){
         let {selected,requestFn} = this.props;
         return requestFn(this.instance,{ selected }).then((data)=>{
+            console.log(data);
             this.updateSeries(data)
             this.instance.hideLoading()
         })

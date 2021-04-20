@@ -31,7 +31,7 @@ export default class HabitsSinglePage extends React.Component{
             <PageLayout title="单物件设定温度、回风温度以及耗电量统计">
                 <div style={{display:'block'}}>
                     <SearchForm onFinish={this.handleSearch}>
-                        <ProjectCascadeSelector hideFrom="内机" />
+                        <ProjectCascadeSelector hideFrom="null" />
                         <div className="searchForm-row">
                             <TimeRangeSelector required/>
                         </div>

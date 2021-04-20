@@ -66,9 +66,11 @@ class RunTimeSingleBar extends React.Component{
                 yAxisIndex:0,
                 itemStyle: {
                     color: '#FD507C',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    opacity:0.5
                 },
                 barWidth:2,
+                barGap:'-100%',
                 data:warm
             },
             {
@@ -77,7 +79,8 @@ class RunTimeSingleBar extends React.Component{
                 yAxisIndex:0,
                 itemStyle: {
                     color: '#2B6AFF',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    opacity:0.5
                 },
                 barWidth:2,
                 data:cold

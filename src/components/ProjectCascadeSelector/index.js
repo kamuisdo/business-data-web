@@ -28,6 +28,8 @@ export default class ProjectCascadeSelector extends React.Component{
         let ifHideLcNo = ['物件','LcNo'].indexOf(hideFrom) >= 0
         let ifHideSystem = ['物件','LcNo','系统'].indexOf(hideFrom) >= 0
         let ifHideInner = ['物件','LcNo','系统','内机'].indexOf(hideFrom) >= 0
+        console.log(hideFrom);
+        console.log(ifHideInner);
         return (
             <>
                 <div className="searchForm-row">
@@ -159,6 +161,7 @@ export default class ProjectCascadeSelector extends React.Component{
                                 textField="lineName"
                                 valueField="lineId"
                                 cascading={this.lcNoRef}
+                                cascadeBy={[this.innerRef]}
                                 cascadeParams={(value)=>{
                                     return { terminalId:value }
                                 }}
@@ -214,7 +217,6 @@ ProjectCascadeSelector.defaultProps = {
     projectRules:[{ required:true }],
     lcNoRules:[],
     systemRules:[],
-    innerRules:[],
-    hideFrom:'内机'
+    innerRules:[]
 }
 

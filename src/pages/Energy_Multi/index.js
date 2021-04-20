@@ -46,8 +46,8 @@ export default class EnergyMultiPage extends React.Component{
     }
 
     handleClickAddBtn(totalSelected){
-        console.log('-----handleClickAddBtn------')
-        console.log(totalSelected)
+        // console.log('-----handleClickAddBtn------')
+        // console.log(totalSelected)
         if(totalSelected.length){
             let {targetType} = this.state
             // 添加的时候，才把原来已选中的清除掉，根据当前的targetType判断
@@ -71,8 +71,8 @@ export default class EnergyMultiPage extends React.Component{
 
     // 移除total已选的数据
     onRemoveItem(key){
-        console.log('--- onRemoveItem -----')
-        console.log(key)
+        // console.log('--- onRemoveItem -----')
+        // console.log(key)
         let t = this.state.selected.filter((v)=>{ return v.key !== key })
         this.setState({
             selected:t
@@ -142,8 +142,8 @@ export default class EnergyMultiPage extends React.Component{
             '系统':'system',
         }   
         let selectProjectTableType = map[formTargetType]
-        console.log('multi render');
-        console.log(selectProjectTableType);
+        // console.log('multi render');
+        // console.log(selectProjectTableType);
         let selectedNameField = selectedTargetType==='物件' ? 'buildingName' : (selectedTargetType==='LcNo'?'lcNo':'lineName')
         return (
             <PageLayout className="energy-multi-page">

@@ -1,6 +1,7 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
-import {onlineRateMultiLine} from '../../../api/onlineCountMulti'
+import {formatEnergyData} from '../../../api/energy'
+import findIndex from 'lodash/findIndex'
 
 /**
  * 多对象在线率折线图
@@ -14,9 +15,10 @@ class EnergyLineMulti extends React.Component{
 
 
     componentDidMount() {
-        let { initEcharts,getOptionWithDefault } = this.props;
+        let { initEcharts,getOptionWithDefault,data } = this.props;
         let chartDom = document.getElementById('EnergyLineMultiChart');
         let myChart = initEcharts(chartDom);
+        let series = this.updateSeries(data)
         this.instance = myChart;
         let option = getOptionWithDefault({
             // grid:{
@@ -41,37 +43,38 @@ class EnergyLineMulti extends React.Component{
                 type: 'time',
                 boundaryGap: false
             },
-            series: []
+            series: series
         })
         myChart.setOption(option);
 
-        this.loadData()
+        if(data === null){
+            myChart.showLoading();
+        }else{
+            myChart.hideLoading();
+        }
 
     }
 
-    loadData(){
-        let {selected,requestFn} = this.props;
-        return requestFn(this.instance,{ selected }).then((data)=>{
-            console.log(data);
-            this.updateSeries(data)
-            this.instance.hideLoading()
-        })
-    }
 
     // 设置line的参数
-    updateSeries(selected){
-        let {getDefaultSeriesOpt} = this.props;
-        this.instance.showLoading()
-        let series = selected.map((data,index)=>{
-            return {
+    updateSeries(data){
+        if(!data || data.length === 0){
+            return []
+        }
+        let {getDefaultSeriesOpt,selected,query} = this.props;
+        let series = [];
+        for(let k in data){
+            let index = findIndex(selected,(v)=>{ return v.key.toString() === k.toString() }) + 1;
+            let t = formatEnergyData(query,data[k]).map((v)=>{ return [v.recordDate,v.electric] })
+            series.push({
                 type:'line',
-                name:index+1,
+                name:index,
                 showSymbol:false,
                 smooth:true,
-                data:data
-            }
-        })
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+                data:t
+            })
+        }
+        return getDefaultSeriesOpt({ series }).series
     }
 
     render() {

@@ -16,7 +16,7 @@ export default class SelectTableItem extends React.Component{
 
     formatSelected(){
         let {selected=[],nameField="key"} = this.props
-        console.log(nameField);
+        // console.log(nameField);
         if(selected.length>1){
             return uniqBy(selected,nameField)
         }
@@ -26,7 +26,7 @@ export default class SelectTableItem extends React.Component{
     render() {
         let {nameField="key"} = this.props
         let selected = this.formatSelected();
-        console.log(selected);
+        // console.log(selected);
         return (
             <div className="select-table-item-box">
                 {

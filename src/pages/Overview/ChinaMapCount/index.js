@@ -29,10 +29,17 @@ export default class ChinaMapCount extends React.Component{
         let {query} = this.props;
         chinaMapCount(query).then((data)=>{
             this.setState({
-                projectCount:data.projectCount,
-                lcCount:data.lcCount,
-                sysCount:data.sysCount,
-                innerCount:data.innerCount
+                projectCount:data.buildingNumTotal,
+                lcCount:data.lcNoNumTotal,
+                sysCount:data.lineNumTotal,
+                innerCount:data.inunitNumTotal
+            })
+        }).catch((err)=>{
+            this.setState({
+                projectCount:'获取失败',
+                lcCount:'获取失败',
+                sysCount:'获取失败',
+                innerCount:'获取失败',
             })
         })
     }

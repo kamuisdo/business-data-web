@@ -1,6 +1,8 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
 import {onlineRateMultiLine} from '../../../api/onlineCountMulti'
+import {formatDataByType} from '../../../api/onlineCountSingle';
+import findIndex from 'lodash/findIndex'
 
 /**
  * 多对象在线率折线图
@@ -10,10 +12,6 @@ class OnlineRateMulti extends React.Component{
     constructor(props) {
         super(props);
         this.instance = null;
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot){
-        this.updateSeries()
     }
 
 
@@ -57,27 +55,52 @@ class OnlineRateMulti extends React.Component{
         })
         myChart.setOption(option);
 
-        this.updateSeries()
+        this.loadData()
 
     }
 
-    // 设置line的参数
-    updateSeries(){
-        let { selected,query } = this.props
-        this.instance.showLoading()
-        onlineRateMultiLine(Object.assign({selected},query)).then((data)=>{
-            let series = data.map((data,index)=>{
-                return {
-                    type:'line',
-                    name:index+1,
-                    showSymbol:false,
-                    smooth:true,
-                    data:data
-                }
-            })
+    loadData(){
+        let {selected,requestFn,query,regionType} = this.props;
+        let codeList = selected.map((v)=>{ return v.key })
+        let t = Object.assign({ codeList:codeList },query,{ regionType })
+        return requestFn(this.instance,t).then((data)=>{
+            this.updateSeries(data)
             this.instance.hideLoading()
-            this.instance.setOption({ series: series });
         })
+    }
+
+    // 设置line的参数
+    updateSeries(data){
+        let {getDefaultSeriesOpt,query,selected} = this.props;
+        console.log(data);
+        // let index = 1
+        let series = []
+        for(let k in data){
+            let formattedData = formatDataByType(query,data[k])
+            let kData = formattedData.map((v)=>{
+                let rate = (v.on/v.sum).toFixed(2)
+                return [v.recordDate,rate]
+            })
+            let index = findIndex(selected,(v)=>{ return v.key.toString() === k.toString() }) + 1;
+            series.push({
+                type:'line',
+                name:index,
+                showSymbol:false,
+                smooth:true,
+                data:kData               
+            })
+        }
+        this.instance.showLoading()
+        // let series = data.map((data,index)=>{
+        //     return {
+        //         type:'line',
+        //         name:index+1,
+        //         showSymbol:false,
+        //         smooth:true,
+        //         data:data
+        //     }
+        // })
+        this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 
     render() {

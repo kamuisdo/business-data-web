@@ -12,6 +12,8 @@ import AreaTable from "./AreaTable";
 import ProvinceTable from "./ProvinceTable";
 import CityTable from "./CityTable";
 import OnlineRateMultiChart from "./OnlineRateMultiLine";
+import { onlineRateMultiLine } from '../../api/onlineCountMulti';
+import uniqBy from 'lodash/uniqBy';
 
 import './index.less'
 
@@ -23,12 +25,15 @@ export default class OnlineRateMulti extends React.Component{
         super(props);
         this.state = {
             areaType:null,
+            tempAreaType:null,
             tableFormData:null,
             chartFormData:null,
             chartData:null,
             selected:[],
             formSelected:[],    // chart根据此字段变更
-            ifShowAlert:false
+            ifShowNoSelectAlert:false,
+            ifShowTypeErrAlert:false
+
         }
         this.tableRef=React.createRef();
         this.tableWrapperRef=React.createRef();
@@ -45,16 +50,41 @@ export default class OnlineRateMulti extends React.Component{
         })
     }
 
-    handleClickAddBtn(totalSelected){
-        this.setState({
-            selected:totalSelected
-        })
+    handleClickAddBtn(currentSelected,totalSelected){
+        // console.log('-----handleClickAddBtn------')
+        // console.log(currentSelected)
+        // console.log(totalSelected)
+        if(currentSelected.length){
+            let {areaType} = this.state
+            // 添加的时候，才把原来已选中的清除掉，根据当前的targetType判断
+            totalSelected = uniqBy(totalSelected.concat(currentSelected),'key')
+            let filteredSelected = this.filterSelected(totalSelected)
+            if(this.tableWrapperRef.current){
+                this.tableWrapperRef.current.resetTotal(filteredSelected);
+            }
+            this.setState({
+                selected:filteredSelected,
+                tempAreaType:areaType
+            })
+        }
+        
     }
+
+    filterSelected(selected){
+        let {areaType} = this.state
+        let nameField = areaType==='地区' ? 'area' : (areaType==='省'?'province':'city')
+        return selected.filter((v)=>{ return v[nameField] !== undefined })
+    }
+
 
     // 移除total已选的数据
     onRemoveItem(key){
-        console.log(key)
+        // console.log('--- onRemoveItem -----')
+        // console.log(key)
         let t = this.state.selected.filter((v)=>{ return v.key !== key })
+        if(this.tableWrapperRef.current){
+            this.tableWrapperRef.current.resetTotal(t);
+        }
         this.setState({
             selected:t
         })
@@ -66,26 +96,35 @@ export default class OnlineRateMulti extends React.Component{
             this.tableRef.current.reloadAndRest();
             this.tableRef.current.clearSelected();
             if(this.tableWrapperRef.current){
-                this.tableWrapperRef.current.reset();
+                this.tableWrapperRef.current.resetCurrent([])
             }
         }
-        // areaType发生变化的时候需要把SelectedItem组件重置
-        if(orgData.areaType !== tableFormData.areaType){
-            this.setState({
-                tableFormData,
-                selected:[]
-            })
-        }else {
-            this.setState({
-                tableFormData
-            })
-        }
+        this.setState({
+            tableFormData
+        })
+        // // areaType发生变化的时候需要把SelectedItem组件重置
+        // if(orgData.areaType !== tableFormData.areaType){
+        //     this.setState({
+        //         tableFormData,
+        //         selected:[]
+        //     })
+        // }else {
+        //     this.setState({
+        //         tableFormData
+        //     })
+        // }
     }
 
     onFinishChartForm(chartFormData){
         if(this.state.selected.length === 0){
             this.setState({
-                ifShowAlert:true
+                ifShowNoSelectAlert:true
+            })
+            return
+        }
+        if(this.state.areaType !== this.state.tempAreaType){
+            this.setState({
+                ifShowTypeErrAlert:true
             })
             return
         }
@@ -98,11 +137,12 @@ export default class OnlineRateMulti extends React.Component{
 
     render() {
 
-        let { areaType,tableFormData,chartFormData,formSelected,ifShowAlert,selected } = this.state;
+        let { areaType,tempAreaType,tableFormData,chartFormData,formSelected,ifShowNoSelectAlert, ifShowTypeErrAlert,selected } = this.state;
         let formAreaType = tableFormData ? tableFormData.areaType : null;
         let ifProvinceVisible = areaType === '市'
         let ifCityVisible = false;
-        let selectedNameField = formAreaType==='地区' ? 'area' : (formAreaType==='省'?'province':'city')
+        let selectedNameField = tempAreaType==='地区' ? 'area' : (tempAreaType==='省'?'province':'city')
+        let chartRegionType = areaType==='地区' ? 'region' : (areaType==='省'?'province':'city')
         return (
             <PageLayout className="online-rate-multi-page">
                 <SearchForm buttonText="查询" onFinish={this.onFinishTableForm} >
@@ -180,17 +220,18 @@ export default class OnlineRateMulti extends React.Component{
                                 rules={[{ required: true }]}
                             >
                                 <Select style={{ width: '12vw' }} placeholder="请选择对比类型">
-                                    {['物件数','LC No','系统','室内机'].map((v)=>{
-                                        return <Option key={v} value={v}>{v}</Option>
+                                    {[{id:'物件',text:'物件数'},{id:'系统',text:'系统'}].map((v)=>{
+                                        return <Option key={v.id} value={v.id}>{v.text}</Option>
                                     })}
                                 </Select>
                             </Form.Item>
                         </div>
                     </SearchForm>
-                    { (ifShowAlert&&selected.length===0) && <Alert message="请选择至少一个对象" type="warning" showIcon />}
+                    { (ifShowNoSelectAlert && selected.length===0) && <Alert message="请选择至少一个对像" type="warning" showIcon />}
+                    { (ifShowTypeErrAlert && areaType !== tempAreaType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <OnlineRateMultiChart selected={formSelected} query={chartFormData}/> }
+                    { chartFormData===null ? <NoChart/> : <OnlineRateMultiChart requestFn={onlineRateMultiLine} regionType={chartRegionType} selected={formSelected} query={chartFormData}/> }
                 </div>
             </PageLayout>
         )

@@ -2,7 +2,7 @@ import axios from "axios";
 import { notification } from 'antd';
 
 let defaultConfig = {
-    timeout:100000,
+    timeout:10000000,
     responseType:'json'
 }
 
@@ -80,21 +80,28 @@ export default function requestFactory(apiOpt={}){
 
     return function (data={},requestOpt={}){
         let dataKey = method === 'get' ? 'params' : 'data';
-        let axiosConfig = Object.assign(defaultConfig,apiOpt,requestOpt,{
+        let axiosConfig = Object.assign({},defaultConfig,apiOpt,requestOpt,{
             url:url,
             baseURL: host,
             method:method,
             [dataKey]:data
         })
+        // console.log(dataKey);
+        // console.log(apiOpt);
+        // console.log(requestOpt);
+        // console.log(axiosConfig);
         return axios.request(axiosConfig).then((res)=>{
             let ifError = res.data.code !== 0;
             if(ifError){
                 //TODO 此处可加入默认的发生错误时的副作用
+                console.log('-  ifError --');
                 errorNotification(res)
             }
             return res.data.data
-        }).catch((err)=>{
-            errorNotification(err)
         })
+        // .catch((err)=>{
+        //     console.log('-  catch --');
+        //     errorNotification(err)
+        // })
     }
 }

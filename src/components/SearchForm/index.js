@@ -20,7 +20,8 @@ export default class SearchForm extends React.Component{
 
     render() {
         let {children,buttonText="生成表格",layout="inline",initialValues={},onFinish,...other} = this.props;
-        this.initialValues = Object.assign({ unit:'天' },initialValues)
+        initialValues = Object.assign({ timeType:'day' },initialValues)
+        this.initialValues = initialValues
         let onFinishFn = onFinish ? (values)=>{
             // 全局转换value的值
             if(values.timeRange && values.timeRange.length){

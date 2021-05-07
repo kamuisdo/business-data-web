@@ -10,10 +10,11 @@ class OnlineCountBar extends React.Component{
 
 
     componentDidMount() {
-        let { initEcharts,getOptionWithDefault } = this.props;
+        let { initEcharts,getOptionWithDefault,data } = this.props;
         let chartDom = document.getElementById('OnlineCountBarChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
+        let series = this.updateSeries(data)
         let option = getOptionWithDefault({
             title:{
                 text:'在线数量分析表'
@@ -37,23 +38,35 @@ class OnlineCountBar extends React.Component{
                 type: 'time',
                 boundaryGap: false
             },
-            series: []
+            series: series
         })
         myChart.setOption(option);
-        this.loadData()
+        if(data === null){
+            myChart.showLoading();
+        }else{
+            myChart.hideLoading();
+        }
+        
     }
 
-    loadData(){
-        let {query,requestFn} = this.props;
-        return requestFn(this.instance,query).then((data)=>{
-            this.updateSeries(data)
-        })
-    }
 
     // 设置line的参数
     updateSeries(data){
-        let { warm,cold,temper } = data;
+        if(!data || data.length === 0){
+            return []
+        }
+        let warm = [];
+        let cold = []
+        let temper = []
+        data.forEach((t)=>{
+            warm.push([t.recordDate,t.hot])
+            cold.push([t.recordDate,t.cold])
+            temper.push([t.recordDate,t.maxWeather])
+        })
         let {getDefaultSeriesOpt} = this.props;
+        // console.log(warm);
+        // console.log(cold);
+        // console.log(temper);
         let series = [
             {
                 name:'暖房',
@@ -94,7 +107,7 @@ class OnlineCountBar extends React.Component{
                 data:temper
             }
         ]
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+        return getDefaultSeriesOpt({ series }).series
     }
 
     render() {

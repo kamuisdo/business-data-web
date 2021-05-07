@@ -1,7 +1,10 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
 import {ProjectTypeEnum} from "../../../enum/projectType";
+import findIndex from 'lodash/findIndex';
 
+let projectTypeObjList = ProjectTypeEnum.toObjectArray()
+let projectTypeList = ProjectTypeEnum.toArray()
 
 class ProjectTypeCount extends React.Component{
 
@@ -49,7 +52,7 @@ class ProjectTypeCount extends React.Component{
             ],
             xAxis: {
                 type: 'category',
-                data:ProjectTypeEnum.toArray(),
+                data:projectTypeList,
                 axisLabel: { interval: 0, rotate: 30 },
                 boundaryGap: false
             },
@@ -70,8 +73,15 @@ class ProjectTypeCount extends React.Component{
 
     // 设置line的参数
     updateSeries(data){
-        let projectData = [69,130,12,115,586,3,150,65,122,58,40,51,20]
-        let sysData = [350,438,39,578,3561,43,936,761,1081,378,269,71,57]
+        // let projectData = [69,130,12,115,586,3,150,65,122,58,40,51,20]
+        // let sysData = [350,438,39,578,3561,43,936,761,1081,378,269,71,57]
+        let projectData = []
+        let sysData = []
+        projectTypeObjList.forEach((v,i)=>{
+            let value = data.find(item => item.buildingTypeCode === v.id)
+            projectData[i] = value ? value.buildingNum || 0 : 0
+            sysData[i] = value ? value.lineNum || 0 : 0
+        })
         let {getDefaultSeriesOpt} = this.props;
         let series = [
             {

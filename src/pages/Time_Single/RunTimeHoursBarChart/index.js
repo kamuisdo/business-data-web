@@ -1,5 +1,7 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import { formatTimeDataToHour } from '../../../api/runtime'
+
 
 class RunTimeHoursBar extends React.Component{
 
@@ -46,7 +48,9 @@ class RunTimeHoursBar extends React.Component{
 
     loadData(){
         let {query,requestFn} = this.props;
+        query.timeType = 'hour'
         return requestFn(this.instance,query).then((data)=>{
+            data = formatTimeDataToHour(data)
             this.updateSeries(data)
         })
     }

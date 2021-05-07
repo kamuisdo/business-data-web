@@ -36,7 +36,7 @@ export default class ProjectQueryPage extends React.Component {
     handleSearch(value) {
         this.formData = value
         if (this.state.ifInit) {
-            this.actionRef.current.reload()
+            this.actionRef.current.reloadAndRest()
         } else {
             this.setState({ifInit: true})
         }
@@ -134,7 +134,7 @@ export default class ProjectQueryPage extends React.Component {
 
                                 <Form.Item
                                     label="物件"
-                                    name="projectName"
+                                    name="buildingName"
                                 >
                                     <Input style={{width: '12vw'}} placeholder="请输入物件名称"/>
                                 </Form.Item>

@@ -1,5 +1,6 @@
 import React from "react";
 import {Form, Select} from "antd";
+import { TimeTypeEnum } from '../../enum/timeType';
 
 const {Option} = Select;
 
@@ -9,18 +10,19 @@ export default class TimeUnitSelector extends React.Component{
         if(required){
             rules.push({ required:true })
         }
+        let t = TimeTypeEnum.toObjectArray();
         return (
             <>
                 <Form.Item
                     label="单位"
-                    name="unit"
+                    name="timeType"
                     rules={rules}
                 >
                     <Select style={{ width: '12vw' }}
                             placeholder="请选择时间单位"
                             {...this.props}>
-                        {data.map((v)=>{
-                            return <Option key={v} value={v}>{v}</Option>
+                        {t.map((v)=>{
+                            return <Option key={v.id} value={v.id}>{v.value}</Option>
                         })}
                     </Select>
                 </Form.Item>

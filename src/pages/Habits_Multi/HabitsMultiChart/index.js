@@ -1,6 +1,7 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
 import chartColor from "../../../enum/chartColor";
+import { formatHabitsData } from '../../../api/habits';
 import {Checkbox} from 'antd';
 import './index.less'
 
@@ -56,15 +57,26 @@ class HabitsMulti extends React.Component {
     }
 
     loadData() {
-        let {selected, requestFn,query} = this.props;
-        return requestFn(this.instance, Object.assign({selected},query)).then((data) => {
+        let {selected, requestFn,query,type} = this.props;
+        let key = type === '物件' ? 'buildingIdArray' : type === 'LcNo' ? 'terminalIdArray' : 'lineIdArray';
+        let idList = selected.map((v)=>{ return v.key })
+        let t = Object.assign({ [key]:idList },query)
+        return requestFn(this.instance, t).then((data) => {
+            data = data.map((v,i)=>{
+                let returnData = v[selected[i].key]
+                if(returnData.length){
+                    let formattedData = formatHabitsData(returnData,query)
+                    return formattedData
+                }
+                return []
+                
+            })
             this.updateSeries(data)
         })
     }
 
     // 设置line的参数
     updateSeries(selected) {
-
         let {getDefaultSeriesOpt} = this.props;
         let series = []
         selected.map((seriesData, index) => {

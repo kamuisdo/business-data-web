@@ -6,7 +6,9 @@ import max from 'lodash/max'
 import min from 'lodash/min'
 import maxBy from 'lodash/maxBy'
 import throttle from 'lodash/throttle'
+import uniq from 'lodash/uniq'
 import { Slider } from 'antd';
+import dayjs from "dayjs";
 
 class AirMap extends React.Component{
 
@@ -36,7 +38,22 @@ class AirMap extends React.Component{
         let xData = this.createAxis('x',sensor);
         let yData = this.createAxis('y',sensor)
         // 默认展示第一天
-        let firstDay = data[0].data[0][0];
+        // 获取时间刻度
+        let sliderKey = this.getSliderTimeKey(data);
+        this.sliderKey = sliderKey;
+        let firstDay = sliderKey[0] ? sliderKey[0] : null;
+        if(!firstDay){
+            for(let i=0;i<data.length;i++){
+                if(data[i].data[0]){
+                    firstDay = data[i].data[0][0]
+                    break
+                }
+            }
+        }
+        // 说明没有数据
+        if(!firstDay){
+            return
+        }
         this.setState({ time:firstDay })
         // 根据Day获取数据
         let dayData = this.getDataByDay(data,firstDay)
@@ -142,7 +159,7 @@ class AirMap extends React.Component{
         let data = dayData.map((v,i)=>{
             let position = sensor[i].position;
             let disabled = sensor[i].disabled;
-            let val = disabled ? '-' : v;
+            let val = (disabled || v===null) ? '-' : v;
             return [position.x,position.y,val]
         })
         let series = [{
@@ -159,18 +176,15 @@ class AirMap extends React.Component{
 
     // 获取当天的传感器的数据
     getDataByDay(data,day){
-        let index = null;
         let t = data.map((v)=>{
             let list = v.data;
-            // 没有index就先找index
-            if(index===null){
-                for(let i=0;i<list.length;i++){
-                    if(list[i][0] === day){
-                        index = i
-                    }
+            // 对每个sensor找当前时间的数据，找不到就返回null
+            for(let i=0;i<list.length;i++){
+                if(list[i][0] === day){
+                    return list[i][1]
                 }
             }
-            return list[index][1]
+            return null
         })
         return t
     }
@@ -201,18 +215,17 @@ class AirMap extends React.Component{
                 }
             });
         },1000)
-        if(value){
-            t(value)
-        }
+        console.log(value);
+        t(value)
 
     }
 
     // 创建刻度echarts
     initXAxisChart(){
-        let { initEcharts,id,data } = this.props;
+        let { initEcharts,id } = this.props;
         let chartDom = document.getElementById(`${id}_xAxis`);
         let myChart = initEcharts(chartDom);
-        let seriesData = data&&data[0] ? data[0].data.map((v)=>{ return [v[0],'-'] }):[]
+        let seriesData = this.sliderKey.map((v)=>{ return [v,'-'] })
         let option = {
             grid:{
                 // 使得图表撑满整个div
@@ -250,19 +263,43 @@ class AirMap extends React.Component{
         myChart.setOption(option)
     }
 
+    // 获取slider的刻度范围，取所有传感器最大的时间范围
+    getSliderTimeKey(data){
+        if(!data || !data[0]){
+            return []
+        }
+        let temp = []
+        data.forEach((sensorData)=>{
+            temp = temp.concat(sensorData.data)
+        })
+        temp = temp.map((v)=>{ return v[0] })
+        // 对时间节点去重，排序
+        temp = uniq(temp)
+        temp = temp.sort((a,b)=>{
+            return dayjs(a)-dayjs(b)
+        })
+        return temp
+    }
+
+
     render() {
         let {id,data,handleRefresh} = this.props;
         let {time} = this.state;
-        // 获取时间刻度
-        let sliderKey = data&&data[0] ? data[0].data.map((v)=>{ return v[0] }) : []
-        this.sliderKey = sliderKey;
+        console.log('--- rend ---');
+        let sliderKey = this.sliderKey;
         return  (data===false) ? <ErrorChart handleClick={handleRefresh}/> : <div style={{position:'relative'}}>
             <div id={id} style={{height:'360px'}}></div>
             <div id={`${id}_xAxis`} style={{height:'80px',width:'calc(100% - 20px)',position:'absolute',zIndex:99,bottom: '-15px'}}></div>
             <span style={{ position:'absolute',bottom: '14px',color:'#7A8392'}}>{time}</span>
             <div style={{width:'calc(100% - 20px)',position:'absolute',marginLeft:'13px',zIndex:100,bottom:'-10px'}}>
                 <Slider defaultValue={0}
-                        tipFormatter={(value)=>{return sliderKey[value] }}
+                        tipFormatter={(value)=>{
+                            // console.log(value);
+                            // console.log(sliderKey);
+                            // console.log(sliderKey[value] );
+                            return sliderKey[value] 
+                            }
+                        }
                         onChange={this.handleSliderChange}
                         min={0} max={sliderKey.length-1}/>
             </div>

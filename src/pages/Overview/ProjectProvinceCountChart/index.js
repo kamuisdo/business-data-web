@@ -1,5 +1,6 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import isNumber from 'lodash/isNumber';
 
 class ProjectProvinceCount extends React.Component{
 
@@ -29,9 +30,21 @@ class ProjectProvinceCount extends React.Component{
             legend:{
                 left:'center'
             },
-            // tooltip:{
-            //   formatter:'{b0}: {c0}<br />{b1}: {c1}'
-            // },
+            tooltip:{
+              formatter:(params)=>{
+                //   console.log(params);
+                  let provinceName = params[0].axisValue
+                  let dom = params.map((v)=>{
+                      let value = v.value
+                      if(v.seriesType === 'line'){
+                        value = isNumber(v.value) ? `${(v.value*100).toFixed(2)}%` : v.value
+                      }
+                      return `${v.marker} ${v.seriesName}：${value}`
+                  })
+                  dom = dom.join('<br/>')
+                  return `${provinceName}<br/>${dom}`
+              }
+            },
             yAxis: [
                 {
                     type: 'value',
@@ -49,7 +62,7 @@ class ProjectProvinceCount extends React.Component{
             ],
             xAxis: {
                 type: 'category',
-                data:['上海','江苏','安徽','浙江'],
+                // data:['上海','江苏','安徽','浙江'],
                 boundaryGap: false
             },
             series: []
@@ -68,9 +81,29 @@ class ProjectProvinceCount extends React.Component{
     // 设置line的参数
     updateSeries(data){
         let {getDefaultSeriesOpt} = this.props;
-        let projectData = [69,130,46,115]
-        let lastProjectData = [65,131,12,110]
-        let rateData = [0.13,0.22,0.53,0.08];
+        let projectData = []
+        let lastProjectData = []
+        let rateData = [];
+        let xAxisData = []
+        data.forEach((v)=>{
+            let buildingNum = v.buildingNum === null ? '-' : v.buildingNum
+            let lastYearBuildingNum = v.lastYearBuildingNum === null ? '-' : v.lastYearBuildingNum
+            let rate = 0
+            if(isNumber(buildingNum) && isNumber(lastYearBuildingNum)){
+                rate = lastYearBuildingNum === 0 ? 1 : buildingNum/lastYearBuildingNum - 1
+            }else{
+                rate = '-'
+            }
+            projectData.push(buildingNum)
+            lastProjectData.push(lastYearBuildingNum)
+            xAxisData.push(v.provinceName)
+            // console.log(v.buildingNum,v.lastYearBuildingNum,v.buildingNum/v.lastYearBuildingNum);
+            rateData.push(rate)
+        })
+        // console.log(rateData);
+        let xAxis = {
+            data:xAxisData
+        }
         let series = [
             {
                 name:'物件数',
@@ -103,7 +136,7 @@ class ProjectProvinceCount extends React.Component{
                 data:rateData
             }
         ]
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+        this.instance.setOption(getDefaultSeriesOpt({ series,xAxis }))
     }
 
     render() {

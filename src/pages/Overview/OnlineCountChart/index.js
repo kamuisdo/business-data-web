@@ -1,6 +1,7 @@
 import React from "react";
 import * as echarts from "echarts";
 import withEcharts from "../../../components/withEcharts";
+import dayjs from "dayjs";
 
 class OnlineCount extends React.Component{
 
@@ -46,7 +47,14 @@ class OnlineCount extends React.Component{
     loadData(){
         let {query,requestFn} = this.props;
         return requestFn(this.instance,query).then((data)=>{
-            this.updateSeries(data)
+            let sysData = []
+            let projectData = []
+            data.forEach((v)=>{
+                let time = dayjs(v.onlineDate).format('YYYY-MM-DD')
+                sysData.push([time,v.lineNum])
+                projectData.push([time,v.buildingNum])
+            })
+            this.updateSeries({ sysData,projectData })
         })
     }
 

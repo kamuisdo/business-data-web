@@ -9,33 +9,67 @@ import * as api from '../../api/onlineCountSingle'
 import OnlineCountBarChart from "./OnlineCountBar";
 import OnlineRateChart from "./OnlineRateChart";
 import NoChart from "../../components/NoChart";
+import ErrorChart from '../../components/ErrorChart'
+
 
 export default class OnlineRateSinglePage extends React.Component{
 
     constructor(props) {
         super(props);
         this.handleSearch = this.handleSearch.bind(this)
+        this.handleErrorClick = this.handleErrorClick.bind(this)
         this.state = {
-            formData:null
+            formData:null,
+            data:null,
+            ifError:false
         }
-
+        
     }
 
     handleSearch(value){
         this.setState({
             formData:value
         })
+        this.loadData(value)
     }
 
+    
+    handleErrorClick(){
+        console.log('---- handleErrorClick -----')
+        this.setState({ ifError:false })
+        this.loadData(this.state.formData)
+    }
+
+
+    loadData(value){
+        this.setState({
+            data:null
+        })
+        let query = Object.assign(value,{ type:0 })
+        api.onlineCountBar(query).then((data)=>{
+            let formatedData = api.formatDataByType(value,data)
+            this.setState({ data:formatedData,ifError:false })
+        }).catch((err)=>{
+            this.setState({ ifError:true })
+        })
+    }
+
+    componentWillUnmount() {
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
+
+
     render() {
-        let { formData } = this.state;
+        let { formData,data,ifError } = this.state;
         return (
             <PageLayout title="在线数量统计分析">
                 <div style={{display:'block'}}>
                     <SearchForm onFinish={this.handleSearch}>
                         <div className="searchForm-row">
-                            <TypeSelector required/>
-                            <AreaSelector />
+                            <TypeSelector data={['物件数','系统']} required/>
+                            <AreaSelector areaRules={[{required:true}]} provinceRules={[{required:true}]}/>
                         </div>
                         <div className="searchForm-row">
                             <TimeRangeSelector required/>
@@ -47,10 +81,10 @@ export default class OnlineRateSinglePage extends React.Component{
                     </SearchForm>
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: <OnlineCountBarChart requestFn={api.onlineCountBar} query={formData}/>}
+                    { formData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<OnlineCountBarChart data={data} query={formData}/>}
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: <OnlineRateChart requestFn={api.getOnlineRateLine} query={formData}/>}
+                    { formData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<OnlineRateChart data={data} query={formData}/>}
                 </div>
             </PageLayout>
 

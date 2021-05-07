@@ -1,5 +1,6 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import { formatMultiTimeData } from '../../../api/runtime'
 
 /**
  * 多对象每日运转时长
@@ -50,8 +51,22 @@ class RunTimeDayMulti extends React.Component{
     }
 
     loadData(){
-        let {selected,requestFn} = this.props;
-        return requestFn(this.instance,{ selected }).then((data)=>{
+        let {selected,requestFn,type,query} = this.props;
+        let key = type === '物件' ? 'buildingIdArray' : type === 'LcNo' ? 'terminalIdArray' : 'lineIdArray';
+        let idList = selected.map((v)=>{ return v.key })
+        let t = Object.assign({ [key]:idList },query)
+        return requestFn(this.instance,t).then((data)=>{
+            data = data.map((v,i)=>{
+                let returnData = v[selected[i].key]
+                if(returnData.length){
+                    let formattedData = formatMultiTimeData(returnData,query)
+                    return formattedData
+                }
+                return []
+                
+            })
+            // console.log(data)
+
             this.updateSeries(data)
             this.instance.hideLoading()
         })
@@ -70,6 +85,8 @@ class RunTimeDayMulti extends React.Component{
                 data:data
             }
         })
+        // console.log(series);
+        // console.log(getDefaultSeriesOpt({ series }));
         this.instance.setOption(getDefaultSeriesOpt({ series }))
     }
 

@@ -6,11 +6,32 @@ let utils = require('../utils')
  * 单物件运转时长柱状图
  */
 router.post('/getRunTimeBarChart',(req,res,next)=>{
-    res.locals.data = {
-        warm:utils.createRandomData(100,200),
-        cold:utils.createRandomData(100,200),
-        temper:utils.createRandomData(0,40),
-    }
+    // res.locals.data = {
+    //     warm:utils.createRandomData(100,200),
+    //     cold:utils.createRandomData(100,200),
+    //     temper:utils.createRandomData(0,40),
+    // }
+
+    res.locals.data = [
+        {
+            "iopesum": 45,
+            "ihetim": 0,
+            "icotim": 45,
+            "_id": 1619071695993    // 时间戳
+        },
+        {
+            "iopesum": 55,
+            "ihetim": 0,
+            "icotim": 50,
+            "_id": 1619158095993
+        },
+        {
+            "iopesum": 45,
+            "ihetim": 0,
+            "icotim": 45,
+            "_id": 1619078647073
+        }
+    ]
 
     next()
 })

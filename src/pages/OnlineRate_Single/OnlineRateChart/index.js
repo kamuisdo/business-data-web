@@ -14,10 +14,11 @@ class OnlineRate extends React.Component{
 
 
     componentDidMount() {
-        let { initEcharts,getOptionWithDefault } = this.props;
+        let { initEcharts,getOptionWithDefault,data } = this.props;
         let chartDom = document.getElementById('OnlineRateChart');
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
+        let series = this.updateSeries(data)
         let option = getOptionWithDefault({
             title:{
                 text:'在线率统计'
@@ -45,24 +46,29 @@ class OnlineRate extends React.Component{
                 type: 'time',
                 boundaryGap: false
             },
-            series: []
+            series: series
         })
         myChart.setOption(option);
 
-        this.loadData()
+        if(data === null){
+            myChart.showLoading();
+        }else{
+            myChart.hideLoading();
+        }
 
     }
 
-    loadData(){
-        let {query,requestFn} = this.props;
-        return requestFn(this.instance,query).then((data)=>{
-            this.updateSeries(data)
-        })
-    }
 
     // 设置line的参数
     updateSeries(data){
+        if(!data || data.length === 0){
+            return []
+        }
         let {getDefaultSeriesOpt} = this.props;
+        let t = data.map((v)=>{
+            let rate = (v.on/v.sum).toFixed(2)
+            return [v.recordDate,rate]
+        })
         let series = [
             {
                 type:'line',
@@ -70,10 +76,10 @@ class OnlineRate extends React.Component{
                 showSymbol:false,
                 smooth:true,
                 itemStyle:{ color:'#2B6AFF' },
-                data:data
+                data:t
             }
         ]
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+        return getDefaultSeriesOpt({ series }).series
     }
 
     render() {

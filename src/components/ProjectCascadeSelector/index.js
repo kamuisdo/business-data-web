@@ -120,7 +120,7 @@ export default class ProjectCascadeSelector extends React.Component{
                                         regionCode:this.areaRef.current.state.value,
                                         provinceCode:this.provinceRef.current.state.value,
                                         cityCode:this.cityRef.current.state.value,
-                                        projectType:value
+                                        buildingType:value
                                     }
                                 }}
                             />

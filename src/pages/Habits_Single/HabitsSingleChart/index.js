@@ -1,5 +1,8 @@
+import dayjs from "dayjs";
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import { TimeTypeEnum } from '../../../enum/timeType'
+import { formatHabitsData } from '../../../api/habits'
 
 class HabitsSingle extends React.Component{
 
@@ -49,12 +52,30 @@ class HabitsSingle extends React.Component{
     loadData(){
         let {query,requestFn} = this.props;
         return requestFn(this.instance,query).then((data)=>{
-            this.updateSeries(data)
+            // let format = TimeTypeEnum.get(query.timeType).format
+            // let setTemper = []
+            // let returnTemper = []
+            // let energy = []
+            // data = data.map((v)=>{ 
+            //     let t = dayjs(v.RECORD_DATE).unix()
+            //     v.time = t
+            //     return v
+            // })
+            // data = data.sort((a,b)=>{ return a.time - b.time })
+            // data.forEach((v)=>{    
+            //     let time =  dayjs(v.RECORD_DATE).format(format)
+            //     setTemper.push([time,v.artmp])
+            //     returnTemper.push([time,v.arsut])
+            //     energy.push([time,v.sew])
+            // })
+            let formattedData = formatHabitsData(data,query)
+            this.updateSeries(formattedData)
         })
     }
 
     // 设置line的参数
     updateSeries(seriesData){
+        console.log(seriesData);
         let { setTemper,returnTemper,energy } = seriesData;
         let {getDefaultSeriesOpt} = this.props;
         let series = [

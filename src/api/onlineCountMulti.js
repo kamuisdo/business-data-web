@@ -1,6 +1,10 @@
 import requestFactory from "../utils/request";
 
-const onlineRateMultiLine = requestFactory({ url:'post/onlineCountMulti/onlineRateMultiLine',hostType:'REACT_APP_MOCK_HOST',mockUrl:'post/onlineCountMulti/onlineRateMultiLine' })
+const onlineRateMultiLine = requestFactory({ 
+    url:'post/report/query/commerce/v1/national/getDeviceOnlineNumCompare',
+    hostType:'REACT_APP_HOST',
+    mockUrl:'post/onlineCountMulti/onlineRateMultiLine' 
+})
 
 export {
     onlineRateMultiLine

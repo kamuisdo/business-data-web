@@ -12,7 +12,8 @@ import EnergyLineMultiChart from "./EnergyMultiLine";
 import EnergyErrorLineMultiChart from "./EnergyErrorMultiLine";
 import SelectProjectTable from "../../components/SelectProjectTable";
 import * as api from '../../api/energy'
-
+import ErrorChart from '../../components/ErrorChart'
+import uniqBy from 'lodash/uniqBy';
 
 const {Option} = Select
 
@@ -28,7 +29,12 @@ export default class EnergyMultiPage extends React.Component{
             chartFormData:null,
             chartData:null,
             selected:[],
-            ifShowAlert:false
+            formSelected:[],    // chart根据此字段变更
+            ifShowAlert:false,
+            data:null,  //请求回来的数据
+            ifError:false,
+            ifShowNoSelectAlert:false,
+            ifShowTypeErrAlert:false
         }
         this.tableRef=React.createRef();
         this.tableWrapperRef=React.createRef();     // selectTable的ref
@@ -37,6 +43,7 @@ export default class EnergyMultiPage extends React.Component{
         this.handleClickAddBtn= this.handleClickAddBtn.bind(this)
         this.onRemoveItem = this.onRemoveItem.bind(this)
         this.onFinishTableForm = this.onFinishTableForm.bind(this)
+        this.handleErrorClick = this.handleErrorClick.bind(this)
     }
 
     handleAreaTypeChange(value){
@@ -45,12 +52,34 @@ export default class EnergyMultiPage extends React.Component{
         })
     }
 
-    handleClickAddBtn(totalSelected){
-        // console.log('-----handleClickAddBtn------')
-        // console.log(totalSelected)
-        if(totalSelected.length){
+    handleErrorClick(){
+        this.setState({ ifError:false })
+        this.loadData()
+    }
+
+    loadData(){
+        this.setState({
+            data:null
+        })
+        let chartFormData = this.state.chartFormData
+        let type = this.state.targetType === '物件' ? 'build' : this.state.targetType === 'LC_No' ? 'terminal' : 'line'
+        let idList = this.state.selected.map((v)=>{ return v.key })
+        let query = Object.assign({},chartFormData,{ type,idList })
+        api.getEnergyMultiLine(query).then((data)=>{
+            data = data || []
+            this.setState({ data:data,ifError:false })
+        }).catch((err)=>{
+            this.setState({ ifError:true })
+        })
+    }
+
+    handleClickAddBtn(currentSelected,totalSelected){
+        console.log('-----handleClickAddBtn------')
+        console.log(currentSelected)
+        if(currentSelected.length){
             let {targetType} = this.state
             // 添加的时候，才把原来已选中的清除掉，根据当前的targetType判断
+            totalSelected = uniqBy(totalSelected.concat(currentSelected),'key')
             let filteredSelected = this.filterSelected(totalSelected)
             if(this.tableWrapperRef.current){
                 this.tableWrapperRef.current.resetTotal(filteredSelected);
@@ -74,6 +103,9 @@ export default class EnergyMultiPage extends React.Component{
         // console.log('--- onRemoveItem -----')
         // console.log(key)
         let t = this.state.selected.filter((v)=>{ return v.key !== key })
+        if(this.tableWrapperRef.current){
+            this.tableWrapperRef.current.resetTotal(t);
+        }
         this.setState({
             selected:t
         })
@@ -83,46 +115,25 @@ export default class EnergyMultiPage extends React.Component{
         let targetType = this.state.targetType;
         this.setState({
             tableFormData,
-            formTargetType:targetType,
-            // selected:[]
+            formTargetType:targetType
         })
         if(this.tableRef.current){
             this.tableRef.current.reloadAndRest();
             this.tableRef.current.clearSelected();
             this.tableWrapperRef.current.resetCurrent([])
         }
-        // let orgData = Object.assign({},this.state.tableFormData)
-        // if(this.tableRef.current){
-        //     this.tableRef.current.reloadAndRest();
-        //     this.tableRef.current.clearSelected();
-        // }
-        
-        // let targetType = this.state.targetType;
-        // // targetType发生变化的时候需要把SelectedItem组件重置
-        // if(orgData.targetType !== tableFormData.targetType){
-        //     console.log('----- 重置已选 ------');
-        //     console.log(this.tableWrapperRef.current)
-        //     if(this.tableWrapperRef.current){
-        //         this.tableWrapperRef.current.resetTotal();
-        //     }
-        //     this.setState({
-        //         tableFormData,
-        //         formTargetType:targetType,
-        //         selected:[]
-        //     })
-            
-        // }else {
-        //     this.setState({
-        //         tableFormData,
-        //         formTargetType:targetType,
-        //     })
-        // }
     }
 
     onFinishChartForm(chartFormData){
         if(this.state.selected.length === 0){
             this.setState({
-                ifShowAlert:true
+                ifShowNoSelectAlert:true
+            })
+            return
+        }
+        if(this.state.targetType !== this.state.selectedTargetType){
+            this.setState({
+                ifShowTypeErrAlert:true
             })
             return
         }
@@ -133,7 +144,7 @@ export default class EnergyMultiPage extends React.Component{
 
     render() {
 
-        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowAlert,selected } = this.state;
+        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert, ifShowTypeErrAlert,selected,data,ifError,formSelected } = this.state;
         // let formTargetType = tableFormData ? tableFormData.targetType : null;
         let hideFrom = targetType || '物件';
         let map = {
@@ -166,7 +177,7 @@ export default class EnergyMultiPage extends React.Component{
                         </Form.Item>
                     </div>
                     <p className="form-title">请搜索并添加相关数据</p>
-                    <ProjectCascadeSelector hideFrom={hideFrom}/>
+                    <ProjectCascadeSelector hideFrom={hideFrom} lcNoRules={[{required:true}]}/>
                 </SearchForm>
                 {
                     tableFormData !== null &&
@@ -204,13 +215,14 @@ export default class EnergyMultiPage extends React.Component{
                             </Form.Item>
                         </div>
                     </SearchForm>
-                    { (ifShowAlert&&selected.length===0) && <Alert message="请选择至少一个对象" type="warning" showIcon />}
+                    { (ifShowNoSelectAlert && selected.length===0) && <Alert message="请选择至少一个对像" type="warning" showIcon />}
+                    { (ifShowTypeErrAlert && targetType !== selectedTargetType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <EnergyLineMultiChart requestFn={api.getEnergyMultiLine} selected={selected}/> }
+                    { chartFormData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyLineMultiChart data={data} query={chartFormData} selected={formSelected}/>}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <EnergyErrorLineMultiChart requestFn={api.getEnergyErrorMultiLine} selected={selected}/> }
+                    { chartFormData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyErrorLineMultiChart data={data} query={chartFormData} selected={formSelected}/>}
                 </div>
             </PageLayout>
         )

@@ -1,5 +1,7 @@
+import dayjs from "dayjs";
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import { formatTimeData } from '../../../api/runtime';
 
 class RunTimeSingleBar extends React.Component{
 
@@ -52,13 +54,30 @@ class RunTimeSingleBar extends React.Component{
     loadData(){
         let {query,requestFn} = this.props;
         return requestFn(this.instance,query).then((data)=>{
+            data = formatTimeData(data,query)
             this.updateSeries(data)
         })
     }
 
+
+    // formatData(data){
+    //     let warm = []
+    //     let cold = []
+    //     data.forEach(item => {
+    //         let time = dayjs(item._id).format('YYYY/MM/DD');
+    //         warm.push([time,item.ihetim])
+    //         cold.push([time,item.icotim])
+    //     });
+    //     console.log(cold);
+    //     return {
+    //         warm,
+    //         cold
+    //     }
+    // }
+
     // 设置line的参数
     updateSeries(seriesData){
-        let { warm,cold,temper } = seriesData;
+        let { warm,cold } = seriesData;
         let series = [
             {
                 name:'暖房',
@@ -85,19 +104,19 @@ class RunTimeSingleBar extends React.Component{
                 barWidth:2,
                 data:cold
             },
-            {
-                name:'室外气温',
-                type: 'line',
-                yAxisIndex:1,
-                itemStyle: {
-                    color: '#B9B9B9'
-                },
-                lineStyle:{
-                    width: 2
-                },
-                showSymbol: false,
-                data:temper
-            }
+            // {
+            //     name:'室外气温',
+            //     type: 'line',
+            //     yAxisIndex:1,
+            //     itemStyle: {
+            //         color: '#B9B9B9'
+            //     },
+            //     lineStyle:{
+            //         width: 2
+            //     },
+            //     showSymbol: false,
+            //     data:temper
+            // }
         ]
         this.instance.setOption({ series })
     }

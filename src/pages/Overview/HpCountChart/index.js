@@ -33,10 +33,10 @@ class HpCount extends React.Component{
                 type: 'value',
                 boundaryGap: false,
             },
-            xAxis: {
+            xAxis:{
                 name:'匹数(HP)',
                 type: 'category',
-                data:[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+                data:[],
                 boundaryGap: false
             },
             series: []
@@ -55,17 +55,26 @@ class HpCount extends React.Component{
 
     // 设置line的参数
     updateSeries(data){
-        data = [69,130,122,115,586,312,150,65,122,58,40,51,20,123,45,234,567]
+        // data = [69,130,122,115,586,312,150,65,122,58,40,51,20,123,45,234,567]
+        let xData = []
+        let seriesData = []
+        data.forEach((v)=>{
+            xData.push(v.hp)
+            seriesData.push(v.lineNum)
+        })
         let {getDefaultSeriesOpt} = this.props;
+        let xAxis = {
+            data:xData
+        }
         let series = [{
             type:'bar',
             yAxisIndex:0,
             itemStyle: {
                 color: '#2B6AFF',
             },
-            data:data
+            data:seriesData
         }]
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+        this.instance.setOption(getDefaultSeriesOpt({ series,xAxis }))
     }
 
     render() {

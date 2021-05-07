@@ -10,7 +10,9 @@ import NoChart from "../../components/NoChart";
 import RunTimeDayMultiChart from "./RunTimeDayMultiLine";
 import RunTimeHoursMultiChart from "./RunTimeHoursMultiLine";
 import SelectProjectTable from "../../components/SelectProjectTable";
+import TimeUnitSelector from '../../components/TimeUnitSelector';
 import * as api from '../../api/runtime'
+import uniqBy from 'lodash/uniqBy';
 
 
 const {Option} = Select
@@ -28,7 +30,8 @@ export default class TimeMultiPage extends React.Component{
             chartFormData:null,
             chartData:null,
             selected:[],
-            ifShowAlert:false
+            ifShowNoSelectAlert:false,
+            ifShowTypeErrAlert:false
         }
         this.tableRef=React.createRef();
         this.tableWrapperRef=React.createRef();     // selectTable的ref
@@ -45,12 +48,13 @@ export default class TimeMultiPage extends React.Component{
         })
     }
 
-    handleClickAddBtn(totalSelected){
-        // console.log('-----handleClickAddBtn------')
-        // console.log(totalSelected)
-        if(totalSelected.length){
+    handleClickAddBtn(currentSelected,totalSelected){
+        console.log('-----handleClickAddBtn------')
+        console.log(currentSelected)
+        if(currentSelected.length){
             let {targetType} = this.state
             // 添加的时候，才把原来已选中的清除掉，根据当前的targetType判断
+            totalSelected = uniqBy(totalSelected.concat(currentSelected),'key')
             let filteredSelected = this.filterSelected(totalSelected)
             if(this.tableWrapperRef.current){
                 this.tableWrapperRef.current.resetTotal(filteredSelected);
@@ -74,6 +78,9 @@ export default class TimeMultiPage extends React.Component{
         // console.log('--- onRemoveItem -----')
         // console.log(key)
         let t = this.state.selected.filter((v)=>{ return v.key !== key })
+        if(this.tableWrapperRef.current){
+            this.tableWrapperRef.current.resetTotal(t);
+        }
         this.setState({
             selected:t
         })
@@ -91,38 +98,18 @@ export default class TimeMultiPage extends React.Component{
             this.tableRef.current.clearSelected();
             this.tableWrapperRef.current.resetCurrent([])
         }
-        // let orgData = Object.assign({},this.state.tableFormData)
-        // if(this.tableRef.current){
-        //     this.tableRef.current.reloadAndRest();
-        //     this.tableRef.current.clearSelected();
-        // }
-        
-        // let targetType = this.state.targetType;
-        // // targetType发生变化的时候需要把SelectedItem组件重置
-        // if(orgData.targetType !== tableFormData.targetType){
-        //     console.log('----- 重置已选 ------');
-        //     console.log(this.tableWrapperRef.current)
-        //     if(this.tableWrapperRef.current){
-        //         this.tableWrapperRef.current.resetTotal();
-        //     }
-        //     this.setState({
-        //         tableFormData,
-        //         formTargetType:targetType,
-        //         selected:[]
-        //     })
-            
-        // }else {
-        //     this.setState({
-        //         tableFormData,
-        //         formTargetType:targetType,
-        //     })
-        // }
     }
 
     onFinishChartForm(chartFormData){
         if(this.state.selected.length === 0){
             this.setState({
-                ifShowAlert:true
+                ifShowNoSelectAlert:true
+            })
+            return
+        }
+        if(this.state.targetType !== this.state.selectedTargetType){
+            this.setState({
+                ifShowTypeErrAlert:true
             })
             return
         }
@@ -133,7 +120,7 @@ export default class TimeMultiPage extends React.Component{
 
     render() {
 
-        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowAlert,selected } = this.state;
+        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowTypeErrAlert,selected } = this.state;
         // let formTargetType = tableFormData ? tableFormData.targetType : null;
         let hideFrom = targetType || '物件';
         let map = {
@@ -188,15 +175,17 @@ export default class TimeMultiPage extends React.Component{
                     <SearchForm initialValues={{ unit: '天' }} onFinish={this.onFinishChartForm}>
                         <div className="searchForm-row">
                             <TimeRangeSelector required={true}/>
+                            <TimeUnitSelector required={true}/>
                         </div>
                     </SearchForm>
-                    { (ifShowAlert&&selected.length===0) && <Alert message="请选择至少一个对象" type="warning" showIcon />}
+                    { (ifShowNoSelectAlert && selected.length===0) && <Alert message="请选择至少一个对像" type="warning" showIcon />}
+                    { (ifShowTypeErrAlert && targetType !== selectedTargetType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <RunTimeDayMultiChart requestFn={api.getRunTimeMulti} selected={selected} query={FormData}/> }
+                    { chartFormData===null ? <NoChart/> : <RunTimeDayMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={selected} query={chartFormData}/> }
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <RunTimeHoursMultiChart requestFn={api.getRunTimeHoursMulti} selected={selected} query={FormData}/> }
+                    { chartFormData===null ? <NoChart/> : <RunTimeHoursMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={selected} query={chartFormData}/> }
                 </div>
             </PageLayout>
         )

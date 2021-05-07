@@ -1,5 +1,8 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import {TimeTypeEnum} from '../../../enum/timeType';
+import config from '../../../utils/config';
+import dayjs from 'dayjs';
 
 class EnergyErrLine extends React.Component{
 
@@ -9,20 +12,15 @@ class EnergyErrLine extends React.Component{
     }
 
     componentDidMount() {
-        let { initEcharts,getOptionWithDefault } = this.props;
+        let { initEcharts,getOptionWithDefault,data } = this.props;
         let chartDom = document.getElementById('EnergyErrLineChart');
         let myChart = initEcharts(chartDom);
+        let series = this.updateSeries(data)
         this.instance = myChart;
         let option = getOptionWithDefault({
             title:{
                 text:'EER_DAY'
             },
-            // legend:{
-            //     left:'center'
-            // },
-            // tooltip:{
-            //   formatter:'{b0}: {c0}<br />{b1}: {c1}'
-            // },
             yAxis: [
                 {
                     type: 'value',
@@ -34,26 +32,37 @@ class EnergyErrLine extends React.Component{
                 type: 'time',
                 boundaryGap: false
             },
-            series: []
+            series: series
         })
         myChart.setOption(option);
 
-        this.loadData()
+        if(data === null){
+            myChart.showLoading();
+        }else{
+            myChart.hideLoading();
+        }
+
     }
 
-    loadData(){
-        let {query,requestFn} = this.props;
-        return requestFn(this.instance,query).then((data)=>{
-            this.updateSeries(data)
-        })
-    }
 
     // 设置line的参数
-    updateSeries(seriesData){
-        let {getDefaultSeriesOpt} = this.props;
+    updateSeries(data){
+        if(!data || data.length === 0){
+            return []
+        }
+        let {getDefaultSeriesOpt,query} = this.props;
+        let format = TimeTypeEnum.get(query.timeType).format;
+        let cold = []
+        let hot = []
+        data.forEach((v)=>{
+            let time = dayjs(v.recordDate).format(format)
+            cold.push([time,(v.coolCapacity/v.coldElectric/config.err_day_params).toFixed(1)])
+            hot.push([time,(v.heatCapacity/v.hotElectric/config.err_day_params).toFixed(1)])
+        })
+        
         let series = [
             {
-                name:'错误率',
+                name:'冷房err_day',
                 type: 'line',
                 itemStyle: {
                     color: '#2B6AFF'
@@ -62,10 +71,22 @@ class EnergyErrLine extends React.Component{
                     width: 1
                 },
                 showSymbol: false,
-                data:seriesData
+                data:cold
+            },
+            {
+                name:'暖房err_day',
+                type: 'line',
+                itemStyle: {
+                    color: '#FD507C'
+                },
+                lineStyle:{
+                    width: 1
+                },
+                showSymbol: false,
+                data:hot
             }
         ]
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+        return getDefaultSeriesOpt({ series }).series
     }
 
     render() {

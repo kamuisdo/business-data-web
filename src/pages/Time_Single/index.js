@@ -46,7 +46,7 @@ export default class TimeSinglePage extends React.Component{
                     { formData===null ? <NoChart />: <RunTimeSingleBarChart requestFn={api.getRunTimeBarChart} query={formData} />}
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: <RunTimeHoursBarChart requestFn={api.getRunTimeHours} query={formData} />}
+                    { formData===null ? <NoChart />: <RunTimeHoursBarChart requestFn={api.getRunTimeBarChart} query={formData} />}
                 </div>
             </PageLayout>
         )

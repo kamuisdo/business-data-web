@@ -15,6 +15,14 @@ const getRegionInfoAsync = () => {
 }
 
 const getProvinceInfoAsync = (regionCode) => {
+    // 没有regionCode的时候，返回全部的省
+    if(!regionCode){
+        let t =[]
+        cityData.forEach((v)=>{
+            t = t.concat(v.children)
+        })
+        return t
+    }
     let item = cityData.find((v) => {
         return v.value === regionCode
     })
@@ -56,7 +64,7 @@ const getRegionInfo = () => {
 // 获取省份下拉框
 const getProvinceInfo = ({regionCode}) => {
     return new Promise((resolve, reject) => {
-        console.log(regionCode)
+        // console.log(regionCode)
         let provinceList = getProvinceInfoAsync(regionCode)
         resolve(provinceList)
     })

@@ -1,5 +1,7 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
+import {TimeTypeEnum} from '../../../enum/timeType';
+import dayjs from 'dayjs';
 
 class EnergyBar extends React.Component{
 
@@ -9,9 +11,10 @@ class EnergyBar extends React.Component{
     }
 
     componentDidMount() {
-        let { initEcharts,getOptionWithDefault } = this.props;
+        let { initEcharts,getOptionWithDefault,data } = this.props;
         let chartDom = document.getElementById('EnergyBarChart');
         let myChart = initEcharts(chartDom);
+        let series = this.updateSeries(data)
         this.instance = myChart;
         let option = getOptionWithDefault({
             title:{
@@ -36,24 +39,34 @@ class EnergyBar extends React.Component{
                 type: 'time',
                 boundaryGap: false
             },
-            series: []
+            series: series
         })
         myChart.setOption(option);
 
-        this.loadData()
-    }
-
-    loadData(){
-        let {query,requestFn} = this.props;
-        return requestFn(this.instance,query).then((data)=>{
-            this.updateSeries(data)
-        })
+        if(data === null){
+            myChart.showLoading();
+        }else{
+            myChart.hideLoading();
+        }
+        
     }
 
     // 设置line的参数
-    updateSeries(seriesData){
-        let { warm,cold,temper } = seriesData;
-        let {getDefaultSeriesOpt} = this.props;
+    updateSeries(data){
+        if(!data || data.length === 0){
+            return []
+        }
+        let {getDefaultSeriesOpt,query} = this.props;
+        let warm =[]
+        let cold = [];
+        let temper =[];
+        let format = TimeTypeEnum.get(query.timeType).format;
+        data.forEach((v)=>{
+            let time = dayjs(v.recordDate).format(format)
+            warm.push([time,v.hotElectric])
+            cold.push([time,v.coldElectric])
+            temper.push([time,v.maxWeather])
+        })
         let series = [
             {
                 name:'暖房',
@@ -94,7 +107,7 @@ class EnergyBar extends React.Component{
                 data:temper
             }
         ]
-        this.instance.setOption(getDefaultSeriesOpt({ series }))
+        return getDefaultSeriesOpt({ series }).series
     }
 
     render() {

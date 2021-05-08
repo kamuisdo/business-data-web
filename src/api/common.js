@@ -5,11 +5,21 @@ import { ProjectTypeEnum } from '../enum/projectType'
 let mockApiHost = 'REACT_APP_MOCK_HOST'
 let apiHost = 'REACT_APP_HOST'
 
+// 包含全国的地区列表
 const getRegionInfoAsync = () => {
     let t = cityData.map((v) => {
         return {text: v.text, value: v.value}
     })
-    // t.unshift({ text:'全国',value:null })
+    t.unshift({ text:'全国',value:null })
+    // console.log(t)
+    return t
+}
+
+// 除去全国的地区列表
+const getRegionInfoExceptAllAsync = () => {
+    let t = cityData.map((v) => {
+        return {text: v.text, value: v.value}
+    })
     // console.log(t)
     return t
 }
@@ -140,6 +150,7 @@ export {
     getProvinceTable,
     getRegionInfo,
     getRegionInfoAsync,
+    getRegionInfoExceptAllAsync,
     getProvinceInfo,
     getProvinceInfoAsync,
     getCityInfo,

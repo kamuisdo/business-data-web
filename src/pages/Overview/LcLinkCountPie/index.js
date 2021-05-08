@@ -11,10 +11,11 @@ class LcLinkCount extends React.Component{
     constructor(props) {
         super(props);
         this.instance = null;
-        this.total = null
+        // this.total = null
         // this.height = 360
         this.state = {
-            height:360
+            height:360,
+            total:null
         }
     }
 
@@ -32,12 +33,7 @@ class LcLinkCount extends React.Component{
                 top:'center',
                 left:'50%',
                 orient:'vertical',
-                // formatter: [
-                //     '{a|这段文本采用样式a}',
-                //     '{b|89.00%}这段用默认样式{c|这段用样式x}'
-                // ].join('\n'),
                 itemGap:20,
-                // formatter: '{a|{name}} |{b|89.00%} |{c|3,213}',
                 textStyle:{
                     rich:{
                         a:{
@@ -71,33 +67,35 @@ class LcLinkCount extends React.Component{
 
     loadData(){
         let {query,requestFn} = this.props;
-        this.total = null
+        this.setState({ total:null })
         return requestFn(this.instance,query).then((data)=>{
-            this.total = sumBy(data,'num')
+            let total = data.length ? sumBy(data,'num') : 0
             let height = 36*data.length > 360 ? 36*data.length : 360
-            this.updateSeries(data)
+
             // console.log(height);
             this.instance.resize({ 
                 height:height,
                 animation:{ duration:0 } 
             })
-            this.setState({ height })
+            this.setState({ height,total })
+            this.updateSeries(data)
         })
     }
 
     // 设置line的参数
     updateSeries(data){
-        
+        let {total} = this.state;
         data = data.map((v)=>{
             return {
                 value:v.num,
                 name:`LCNo链接${v.lcNoToLineType}个系统`,
-                percent:`${(v.num/this.total*100).toFixed(2)}%`
+                percent:`${(v.num/total*100).toFixed(2)}%`
             }
         })
         let {getDefaultSeriesOpt} = this.props;
         let legend = {
             // formatter: `{a|{name}} |{b|${percent}} |{c|${value}}`,
+            show:data.length>0 ,
             formatter:(name)=>{
                 // console.log(...arguments);
                 // console.log(name1,name2);
@@ -105,7 +103,7 @@ class LcLinkCount extends React.Component{
                 if(item){
                     return `{a|${name}} |{b|${item.percent}} |{c|${item.value}}`
                 }else{
-                    return ''
+                    return null
                 }
                 
             }
@@ -151,13 +149,14 @@ class LcLinkCount extends React.Component{
     }
 
     render() {
-        let style = { height:`${this.height}px` }
+        let { total,height } = this.state
+        let style = { height:`${height}px` }
         return (
             <div style={style}>
                 <div className="LcLinkCountChart-text-box" style={{ position:"absolute",display:'flex',justifyContent:'center',flexDirection:'column',width:'50%',height:'100%' }}>
                     <div style={{ margin:'0 auto' }}>
                         <p style={{ color:'#7A8392',fontSize:'12px',textAlign:'center',margin:'0px' }}>系统总数</p>
-                        <p style={{ fontSize:'24px',margin:'0px' }}>{ this.total ? numeral(this.total).format('0,0') : '' }</p>
+                        <p style={{ fontSize:'24px',margin:'0px',textAlign:'center' }}>{ total === null ? '加载中' : numeral(total).format('0,0')}</p>
                     </div>
                 </div>
                 <div id="LcLinkCountChart" style={style}></div>

@@ -140,6 +140,7 @@ export default class EnergyMultiPage extends React.Component{
         this.setState({
             chartFormData
         })
+        this.loadData()
     }
 
     render() {

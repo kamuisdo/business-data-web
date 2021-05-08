@@ -93,15 +93,15 @@ export default class ProjectDetail extends React.Component{
                         </div>
                         <div className="project-info-item">
                             <span className="project-info-label">地址：</span>
-                            <span className="project-info-text">{address}</span>
+                            <span className="project-info-text">{address || '-'}</span>
                         </div>
                         <div className="project-info-item">
                             <span className="project-info-label">合计马力：</span>
-                            <span className="project-info-text">{powerNum}</span>
+                            <span className="project-info-text">{powerNum || '-'}</span>
                         </div>
                         <div className="project-info-item">
                             <span className="project-info-label">创建时间：</span>
-                            <span className="project-info-text">{atStartDt}</span>
+                            <span className="project-info-text">{atStartDt|| '-'}</span>
                         </div>
                     </div>
                     { ifError ? <ErrorChart handleClick={this.loadDetailData}/> :

@@ -1,6 +1,6 @@
 import React from "react";
 import {Table} from "antd";
-import { getRegionInfoAsync } from '../../../api/common'
+import { getRegionInfoExceptAllAsync } from '../../../api/common'
 
 export default class AreaTable extends React.Component{
     constructor(props) {
@@ -43,7 +43,7 @@ export default class AreaTable extends React.Component{
     render() {
         const { selectedRowKeys } = this.state;
         let columns = [{ title:'地区',dataIndex:'area' }]
-        let areaList = getRegionInfoAsync()
+        let areaList = getRegionInfoExceptAllAsync()
         let dataSource = areaList.map((v,index)=>{
             return { key:v.value,area:v.text }
         })

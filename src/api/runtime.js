@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 const getRunTimeBarChart = requestFactory({ 
     url: 'post/report/query/commerce/v1/device/getRunTimeConsume', 
-    hostType: 'REACT_APP_MOCK_HOST', 
+    hostType: 'REACT_APP_HOST',
     mockUrl: 'post/runtime/getRunTimeBarChart' 
 })
 

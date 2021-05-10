@@ -24,7 +24,7 @@ export default class OverviewPage extends React.Component{
         this.state = {
             searchShow:false,
             formData:{ 
-                beginTime:dayjs().subtract(30, 'days').format('YYYY-MM-DD'),
+                beginTime:dayjs().subtract(1, 'year').format('YYYY-MM-DD'),
                 endTime: dayjs().format('YYYY-MM-DD')
             }
         }

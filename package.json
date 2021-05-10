@@ -2,6 +2,7 @@
   "name": "business-data-web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://69.231.144.133/commerce",
   "dependencies": {
     "@ant-design/icons": "^4.5.0",
     "@ant-design/pro-layout": "^6.15.0",

@@ -31,6 +31,8 @@ const formatDataByType = (value,data)=>{
              recordDate:dayjs(v.recordDate).format(format)
          }
      })
+    console.log(data)
+    console.log(t)
      return t
 }
 

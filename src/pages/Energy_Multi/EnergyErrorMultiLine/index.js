@@ -62,7 +62,10 @@ class EnergyErrorLineMulti extends React.Component{
         let {getDefaultSeriesOpt,selected,query} = this.props;
         let series = [];
         for(let k in data){
+            console.log(k)
+            console.log(selected)
             let index = findIndex(selected,(v)=>{ return v.key.toString() === k.toString() }) + 1;
+            console.log(index)
             let t = formatEnergyData(query,data[k]).map((v)=>{ return [v.recordDate,v.eer] })
             series.push({
                 type:'line',

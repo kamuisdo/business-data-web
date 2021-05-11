@@ -26,7 +26,6 @@ export default class SelectTableItem extends React.Component{
     render() {
         let {nameField="key"} = this.props
         let selected = this.formatSelected();
-        // console.log(selected);
         return (
             <div className="select-table-item-box">
                 {

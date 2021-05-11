@@ -13,7 +13,7 @@ import SelectProjectTable from "../../components/SelectProjectTable";
 import TimeUnitSelector from '../../components/TimeUnitSelector';
 import * as api from '../../api/runtime'
 import uniqBy from 'lodash/uniqBy';
-
+import config from '../../utils/config'
 
 const {Option} = Select
 
@@ -30,8 +30,10 @@ export default class TimeMultiPage extends React.Component{
             chartFormData:null,
             chartData:null,
             selected:[],
+            formSelected:[],
             ifShowNoSelectAlert:false,
-            ifShowTypeErrAlert:false
+            ifShowTypeErrAlert:false,
+            ifShowSelectedLimitAlert:false
         }
         this.tableRef=React.createRef();
         this.tableWrapperRef=React.createRef();     // selectTable的ref
@@ -59,10 +61,13 @@ export default class TimeMultiPage extends React.Component{
             if(this.tableWrapperRef.current){
                 this.tableWrapperRef.current.resetTotal(filteredSelected);
             }
-            this.setState({
-                selected:filteredSelected,
-                selectedTargetType:targetType
-            })
+            let ifOverLimit = this.ifSelectedOverLimit(filteredSelected)
+            if(!ifOverLimit){
+                this.setState({
+                    selected:filteredSelected,
+                    selectedTargetType:targetType
+                })
+            }
         }
         
     }
@@ -113,14 +118,24 @@ export default class TimeMultiPage extends React.Component{
             })
             return
         }
+        let formSelected = this.state.selected
         this.setState({
-            chartFormData
+            chartFormData,
+            formSelected
         })
     }
 
+    ifSelectedOverLimit(selected){
+        // 可选对象数量的最大值
+        let result = selected.length > config.selectedItemLimit
+        this.setState({ ifShowSelectedLimitAlert:result })
+        return result
+    }
+
+
     render() {
 
-        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowTypeErrAlert,selected } = this.state;
+        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert,ifShowTypeErrAlert,selected,formSelected } = this.state;
         // let formTargetType = tableFormData ? tableFormData.targetType : null;
         let hideFrom = targetType || '物件';
         let map = {
@@ -179,13 +194,14 @@ export default class TimeMultiPage extends React.Component{
                         </div>
                     </SearchForm>
                     { (ifShowNoSelectAlert && selected.length===0) && <Alert message="请选择至少一个对像" type="warning" showIcon />}
+                    { ifShowSelectedLimitAlert && <Alert message={`选择的对象不可超过${config.selectedItemLimit}个`} type="warning" showIcon /> }
                     { (ifShowTypeErrAlert && targetType !== selectedTargetType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <RunTimeDayMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={selected} query={chartFormData}/> }
+                    { chartFormData===null ? <NoChart/> : <RunTimeDayMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={formSelected} query={chartFormData}/> }
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <RunTimeHoursMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={selected} query={chartFormData}/> }
+                    { chartFormData===null ? <NoChart/> : <RunTimeHoursMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={formSelected} query={chartFormData}/> }
                 </div>
             </PageLayout>
         )

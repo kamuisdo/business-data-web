@@ -14,6 +14,7 @@ import CityTable from "./CityTable";
 import OnlineRateMultiChart from "./OnlineRateMultiLine";
 import { onlineRateMultiLine } from '../../api/onlineCountMulti';
 import uniqBy from 'lodash/uniqBy';
+import config from '../../utils/config'
 
 import './index.less'
 
@@ -32,8 +33,8 @@ export default class OnlineRateMulti extends React.Component{
             selected:[],
             formSelected:[],    // chart根据此字段变更
             ifShowNoSelectAlert:false,
-            ifShowTypeErrAlert:false
-
+            ifShowTypeErrAlert:false,
+            ifShowSelectedLimitAlert:false
         }
         this.tableRef=React.createRef();
         this.tableWrapperRef=React.createRef();
@@ -62,10 +63,13 @@ export default class OnlineRateMulti extends React.Component{
             if(this.tableWrapperRef.current){
                 this.tableWrapperRef.current.resetTotal(filteredSelected);
             }
-            this.setState({
-                selected:filteredSelected,
-                tempAreaType:areaType
-            })
+            let ifOverLimit = this.ifSelectedOverLimit(filteredSelected)
+            if(!ifOverLimit){
+                this.setState({
+                    selected:filteredSelected,
+                    tempAreaType:areaType
+                })
+            }
         }
         
     }
@@ -91,7 +95,7 @@ export default class OnlineRateMulti extends React.Component{
     }
 
     onFinishTableForm(tableFormData){
-        let orgData = Object.assign({},this.state.tableFormData)
+        // let orgData = Object.assign({},this.state.tableFormData)
         if(this.tableRef.current){
             this.tableRef.current.reloadAndRest();
             this.tableRef.current.clearSelected();
@@ -135,14 +139,21 @@ export default class OnlineRateMulti extends React.Component{
         })
     }
 
-    render() {
+    ifSelectedOverLimit(selected){
+        // 可选对象数量的最大值
+        let result = selected.length > config.selectedItemLimit
+        this.setState({ ifShowSelectedLimitAlert:result })
+        return result
+    }
 
-        let { areaType,tempAreaType,tableFormData,chartFormData,formSelected,ifShowNoSelectAlert, ifShowTypeErrAlert,selected } = this.state;
+    render() {
+        let { areaType,tempAreaType,tableFormData,chartFormData,formSelected,ifShowNoSelectAlert,ifShowTypeErrAlert,ifShowSelectedLimitAlert,selected } = this.state;
         let formAreaType = tableFormData ? tableFormData.areaType : null;
         let ifProvinceVisible = areaType === '市'
         let ifCityVisible = false;
         let selectedNameField = tempAreaType==='地区' ? 'area' : (tempAreaType==='省'?'province':'city')
         let chartRegionType = areaType==='地区' ? 'region' : (areaType==='省'?'province':'city')
+
         return (
             <PageLayout className="online-rate-multi-page">
                 <SearchForm buttonText="查询" onFinish={this.onFinishTableForm} >
@@ -228,6 +239,7 @@ export default class OnlineRateMulti extends React.Component{
                         </div>
                     </SearchForm>
                     { (ifShowNoSelectAlert && selected.length===0) && <Alert message="请选择至少一个对像" type="warning" showIcon />}
+                    { ifShowSelectedLimitAlert && <Alert message={`选择的对象不可超过${config.selectedItemLimit}个`} type="warning" showIcon /> }
                     { (ifShowTypeErrAlert && areaType !== tempAreaType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">

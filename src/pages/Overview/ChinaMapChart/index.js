@@ -143,7 +143,7 @@ export default class ChinaMapChart extends React.PureComponent{
             'inunitNum':'室内机',
         }
         return(<div>
-            <Select defaultValue="buildingNum" value={this.state.unit} onChange={this.handleSelectorChange} style={{ width: 180,float:'left',position:'absolute',zIndex:1000 }}>
+            <Select defaultValue="buildingNum" value={this.state.unit} onChange={this.handleSelectorChange} style={{ width: '8vw',float:'left',position:'absolute',zIndex:1000 }}>
                 <Option key='buildingNum' value="buildingNum">物件</Option>
                 <Option key='lcNoNum' value="lcNoNum">LC No</Option>
                 <Option key='lineNum' value="lineNum">系统</Option>

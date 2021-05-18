@@ -31,10 +31,12 @@ class OnlineRateMulti extends React.Component{
             tooltip:{
                 formatter:function(params){
                     // console.log(params);
-                    params = params[0]
-                    let value = params.value[1]
-                    let date = params.value[0];
-                    return `${params.seriesName}<br/><span>${params.marker}${date}：${Math.floor(value*100)}%</span>`
+                    // params = params[0]
+                    // let value = params.value[1]
+                    // let date = params.value[0];
+                    let time = params[0].value[0]
+                    let dom = params.map((v)=>{ return `${v.marker} ${v.seriesName}：${Math.floor(v.value[1]*100)}%` }).join('<br/>')
+                    return `${time}<br/>${dom}`
                 }
             },
             yAxis: {
@@ -90,6 +92,7 @@ class OnlineRateMulti extends React.Component{
                 data:kData               
             })
         }
+        series = series.sort((a,b)=>{ return a.name - b.name })
         this.instance.showLoading()
         // let series = data.map((data,index)=>{
         //     return {

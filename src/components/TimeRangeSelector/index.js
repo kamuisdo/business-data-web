@@ -27,7 +27,7 @@ class TimeRangeSelector extends React.Component{
     // 设置时间为近7日
     handleSevenDay() {
         this.context.current.setFieldsValue({
-            timeRange: [moment().subtract(1, 'days'), moment()]
+            timeRange: [moment().subtract(7, 'days'), moment()]
         });
     }
 

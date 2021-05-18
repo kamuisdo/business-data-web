@@ -10,6 +10,7 @@ import * as api from '../../api/air'
 import moment from "moment";
 import './index.less'
 import dayjs from 'dayjs';
+import { TimeTypeEnum } from '../../enum/timeType'
 
 // 默认近7日
 let formInitialValues = { timeRange:[moment().subtract(7, 'days'), moment()] }
@@ -208,11 +209,13 @@ export default class AirQualityPage extends React.Component{
         this.temperRef = React.createRef();
         this.humidityRef = React.createRef();
         this.formData = formInitialValues
+        // 默认按照小时显示
+        this.timeType = 'hour'  // 可选值：day,month,hour,min
+        this.timeTypeFormat = TimeTypeEnum.get('hour').format
     }
 
     componentDidMount() {
         // this.updateCo2Data()
-        // // TODO 替换接口方法
         // this.updatePm25Data()
         // this.updateTemperData()
         // this.updateHumidityData()
@@ -230,9 +233,13 @@ export default class AirQualityPage extends React.Component{
             humidityData:null
         })
         let sensorList = sensor.map((v)=>{ return v.mac})
+        // 默认按照小时显示
+        let timeType = this.timeType
+        let timeTypeFormat = this.timeTypeFormat
         api.getAirSensorData({
             beginTime:dayjs(formData.timeRange[0]).format('YYYY-MM-DD'),
             endTime:dayjs(formData.timeRange[1]).format('YYYY-MM-DD'),
+            timeType,
             sensorList
         }).then((data)=>{
             let co2Data =[]
@@ -244,7 +251,9 @@ export default class AirQualityPage extends React.Component{
             // })
             // // 所有存在数据的时间点
             // let timeList = []
-            let tempSensor = sensor.map((v)=>{
+            // 先对data的collectTime排序
+            data = data.sort((a,b)=>{ return dayjs(a.collectTime) - dayjs(b.collectTime)  })
+            sensor.forEach((v)=>{
                 // 应该能找到多个时间的数据
                 let thisSensorData = data.filter((t)=>{ return v.mac === t.sensorMac })
                 if(thisSensorData.length > 0){
@@ -254,23 +263,23 @@ export default class AirQualityPage extends React.Component{
                 // timeList = timeList.concat(thisSensorData.map((v)=>{return v.collectTime}))
                 co2Data.push({
                     name:v.name,
-                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format('YYYY/MM/DD HH:mm'),t.co2] })
+                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.co2] })
                 })
                 pm25Data.push({
                     name:v.name,
-                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format('YYYY/MM/DD HH:mm'),t.pm25] })
+                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.pm25] })
                 })
                 temperData.push({
                     name:v.name,
-                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format('YYYY/MM/DD HH:mm'),t.temp] })
+                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.temp1] })
                 })
                 humidityData.push({
                     name:v.name,
-                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format('YYYY/MM/DD HH:mm'),t.humidity] })
+                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.humidity] })
                 })
-                return Object.assign({},v,{ data:thisSensorData })
+                // return Object.assign({},v,{ data:thisSensorData })
             })
-            // console.log(co2Data);
+            console.log(temperData);
             // console.log(pm25Data);
             // console.log(temperData);
             // console.log(humidityData);
@@ -314,7 +323,7 @@ export default class AirQualityPage extends React.Component{
 
     handleFormSearch(value){
         console.log(value)
-        let formData = value;
+        // let formData = value;
         this.formData = value
         this.loadData()
         // this.setState({ formData:value });
@@ -392,16 +401,16 @@ export default class AirQualityPage extends React.Component{
                 </div>
                 <div style={{ display:'flex',flexWrap:'wrap' }}>
                     <div className="chart-box air-chart-box" style={{ marginRight:'20px' }}>
-                        <AirChart id="co2Chart" title="CO2浓度" chartRef={this.co2Ref} data={co2Data} unitText={co2Unit} handleRefresh={this.loadData}/>
+                        <AirChart id="co2Chart" title="CO2浓度" timeTypeFormat={this.timeTypeFormat} chartRef={this.co2Ref} data={co2Data} unitText={co2Unit} handleRefresh={this.loadData}/>
                     </div>
                     <div className="chart-box air-chart-box">
-                        <AirChart id="pm25Chart" title="PM2.5" chartRef={this.pm25Ref} data={pm25Data} unitText={pm2Unit} handleRefresh={this.loadData}/>
+                        <AirChart id="pm25Chart" title="PM2.5" timeTypeFormat={this.timeTypeFormat} chartRef={this.pm25Ref} data={pm25Data} unitText={pm2Unit} handleRefresh={this.loadData}/>
                     </div>
                     <div className="chart-box air-chart-box" style={{ marginRight:'20px' }}>
-                        <AirChart id="temperChart" title="温度" chartRef={this.temperRef} data={temperData} unitText={temperUnit} handleRefresh={this.loadData}/>
+                        <AirChart id="temperChart" title="温度" timeTypeFormat={this.timeTypeFormat} chartRef={this.temperRef} data={temperData} unitText={temperUnit} handleRefresh={this.loadData}/>
                     </div>
                     <div className="chart-box air-chart-box">
-                        <AirChart id="humidityChart" title="湿度" chartRef={this.humidityRef} data={humidityData} unitText={humidityUnit} handleRefresh={this.loadData}/>
+                        <AirChart id="humidityChart" title="湿度" timeTypeFormat={this.timeTypeFormat} chartRef={this.humidityRef} data={humidityData} unitText={humidityUnit} handleRefresh={this.loadData}/>
                     </div>
                     <div className="chart-box air-chart-box" style={{ marginRight:'20px' }}>
                         <AirMapChart id="co2Map"

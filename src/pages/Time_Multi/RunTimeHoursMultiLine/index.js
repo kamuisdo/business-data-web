@@ -1,6 +1,6 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
-import { formatTimeDataToHour } from '../../../api/runtime'
+import {formatTimeDataToHour, ifNoDataFn} from '../../../api/runtime'
 
 /**
  * 多对象每日运转时长
@@ -61,7 +61,7 @@ class RunTimeHoursMulti extends React.Component{
         let idList = selected.map((v)=>{ return v.key })
         let t = Object.assign({ [key]:idList },query)
         t.timeType = 'hour'
-        return requestFn(this.instance,t).then((data)=>{
+        return requestFn(this.instance,t,{ ifNoDataFn }).then((data)=>{
             data = data.map((v,i)=>{
                 let returnData = v[selected[i].key]
                 if(returnData.length){

@@ -48,6 +48,18 @@ const formatMultiTimeData = (data,query)=>{
     });
 }
 
+// 判断是不是返回了空数据
+const ifNoDataFn = (data) =>{
+    if(!data || data.length === 0){ return true }
+    let t = []
+    data.forEach((v)=>{
+        for(let k in v){
+            t = t.concat(v[k])
+        }
+    })
+    return t.length === 0
+}
+
 // 格式化数据成为0-24小时的数据
 // 返回24长度的数组
 const formatTimeDataToHour = (data)=>{
@@ -74,7 +86,8 @@ export {
     getRunTimeHoursMulti,
     formatTimeData,
     formatTimeDataToHour,
-    formatMultiTimeData
+    formatMultiTimeData,
+    ifNoDataFn
     // getRunTimeErrLine,
     // getRunTimeMultiLine,
     // getRunTimeErrorMultiLine

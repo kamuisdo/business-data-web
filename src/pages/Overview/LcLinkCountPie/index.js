@@ -23,15 +23,27 @@ class LcLinkCount extends React.Component{
     componentDidMount() {
         let { initEcharts,getOptionWithDefault } = this.props;
         let chartDom = document.getElementById('LcLinkCountChart');
-        let myChart = initEcharts(chartDom);
+        let myChart = initEcharts(chartDom,null,{ height:'360px' });
         this.instance = myChart;
         let option = getOptionWithDefault({
+            // grid:{
+            //     // 使得图表撑满整个div
+            //     top:"0px",
+            //     left:"50px",
+            //     right:"50px",
+            //     bottom:"50px",
+            //     backgroundColor: '#fff',
+            //     width:"auto", //图例宽度
+            //     height:"45%", //图例高度
+            // },
             title:{
                 text:'每个LCNo连接的系统数'
             },
             legend:{
                 top:'center',
                 left:'50%',
+                type: 'scroll',
+                height: 320,
                 orient:'vertical',
                 itemGap:20,
                 textStyle:{
@@ -57,7 +69,6 @@ class LcLinkCount extends React.Component{
             tooltip:{
                 trigger: 'item'
             },
-
             color:['#2B6AFF','#F759AA','#FEAEDB','#FBD237','#94DFF3','#965DE7','#4ADE63'],
             series: []
         })
@@ -73,10 +84,10 @@ class LcLinkCount extends React.Component{
             let height = 36*data.length > 360 ? 36*data.length : 360
 
             // console.log(height);
-            this.instance.resize({ 
-                height:height,
-                animation:{ duration:0 } 
-            })
+            // this.instance.resize({
+            //     // height:height,
+            //     animation:{ duration:0 }
+            // })
             this.setState({ height,total })
             this.updateSeries(data)
         })
@@ -138,8 +149,9 @@ class LcLinkCount extends React.Component{
                 // ]
             },
         ]
-
         this.instance.setOption(getDefaultSeriesOpt({ series,legend }))
+        console.log(this.instance.getOption())
+        console.log(this.instance.getHeight())
     }
 
     componentWillUnmount() {
@@ -149,17 +161,16 @@ class LcLinkCount extends React.Component{
     }
 
     render() {
-        let { total,height } = this.state
-        let style = { height:`${height}px` }
+        let { total } = this.state
         return (
-            <div style={style}>
+            <div style={{height:'360px'}}>
                 <div className="LcLinkCountChart-text-box" style={{ position:"absolute",display:'flex',justifyContent:'center',flexDirection:'column',width:'50%',height:'100%' }}>
                     <div style={{ margin:'0 auto' }}>
                         <p style={{ color:'#7A8392',fontSize:'12px',textAlign:'center',margin:'0px' }}>系统总数</p>
                         <p style={{ fontSize:'24px',margin:'0px',textAlign:'center' }}>{ total === null ? '加载中' : numeral(total).format('0,0')}</p>
                     </div>
                 </div>
-                <div id="LcLinkCountChart" style={style}></div>
+                <div id="LcLinkCountChart" style={{height:'360px'}}></div>
             </div>
         )
     }

@@ -54,7 +54,7 @@ export default class SelectTable extends React.Component{
         let {render,handleClickAddBtn} = this.props;
         return (
             <>
-                <div style={{ display:'flex',justifyContent:'left',paddingBottom:'10px' }}>
+                <div style={{ display:'flex',justifyContent:'left',paddingBottom:'10px',marginLeft:'24px' }}>
                     <Button onClick={(e) => handleClickAddBtn(currentPageSelected,totalSelected)} disabled={currentPageSelected.length===0} type="primary" icon={<PlusOutlined />}>添加</Button>
                     <p style={{ marginBottom:0,marginLeft:20,lineHeight:'32px',fontSize:'14px',color:'#7A8392' }}>已选中{currentPageSelected.length}个</p>
                 </div>

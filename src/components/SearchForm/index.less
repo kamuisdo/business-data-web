@@ -1,8 +1,18 @@
-.searchForm>.searchForm-row{
-  display: flex;
-  width: 100%;
-  margin-bottom: 20px;
-}
+@import "../../theme";
+
 .searchForm{
   padding-bottom: 30px !important;
+  >.searchForm-row{
+    display: flex;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .searchForm-reset-btn,.searchForm-reset-btn:hover,.searchForm-reset-btn:active,.searchForm-reset-btn:focus{
+    color: @main !important;
+    //color: #548dff;
+  }
+  .searchForm-reset-btn:focus{
+    //color: red !important;
+    background-color: transparent !important;
+  }
 }

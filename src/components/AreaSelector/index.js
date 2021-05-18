@@ -22,7 +22,7 @@ export default class AreaSelector extends React.Component{
 
 
     render() {
-        let {ifProvinceVisible=true,ifCityVisible=true,areaRules,provinceRules,cityRules} = this.props
+        let {ifProvinceVisible=true,ifCityVisible=true,areaRules,provinceRules,cityRules,ifAreaIncludeAll=false} = this.props
         return(
             <>
                 <Form.Item
@@ -33,7 +33,7 @@ export default class AreaSelector extends React.Component{
                     <ApiSelect
                         placeholder="请选择地区"
                         ref={this.areaRef}
-                        requestFn={api.getRegionInfo}
+                        requestFn={ifAreaIncludeAll ? api.getRegionInfoIncludeAll : api.getRegionInfo}
                         textField="text"
                         valueField="value"
                         cascadeBy={[this.provinceRef]}

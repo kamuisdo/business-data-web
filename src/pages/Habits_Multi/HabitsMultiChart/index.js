@@ -4,6 +4,8 @@ import chartColor from "../../../enum/chartColor";
 import { formatHabitsData } from '../../../api/habits';
 import {Checkbox} from 'antd';
 import './index.less'
+import {ifNoDataFn} from "../../../api/runtime";
+import NoChart from "../../../components/NoChart";
 
 class HabitsMulti extends React.Component {
 
@@ -61,7 +63,8 @@ class HabitsMulti extends React.Component {
         let key = type === '物件' ? 'buildingIdArray' : type === 'LcNo' ? 'terminalIdArray' : 'lineIdArray';
         let idList = selected.map((v)=>{ return v.key })
         let t = Object.assign({ [key]:idList },query)
-        return requestFn(this.instance, t).then((data) => {
+        let noDataDom = <div className='chart-box'><NoChart/></div>
+        return requestFn(this.instance, t,{ ifNoDataFn,noDataDom }).then((data) => {
             data = data.map((v,i)=>{
                 let returnData = v[selected[i].key]
                 if(returnData.length){

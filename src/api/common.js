@@ -6,7 +6,7 @@ let mockApiHost = 'REACT_APP_MOCK_HOST'
 let apiHost = 'REACT_APP_HOST'
 
 // 包含全国的地区列表
-const getRegionInfoAsync = () => {
+const getRegionInfoIncludeAllAsync = () => {
     let t = cityData.map((v) => {
         return {text: v.text, value: v.value}
     })
@@ -16,7 +16,7 @@ const getRegionInfoAsync = () => {
 }
 
 // 除去全国的地区列表
-const getRegionInfoExceptAllAsync = () => {
+const getRegionInfoAsync = () => {
     let t = cityData.map((v) => {
         return {text: v.text, value: v.value}
     })
@@ -71,6 +71,14 @@ const getRegionInfo = () => {
         resolve(list)
     })
 }
+
+const getRegionInfoIncludeAll = ()=>{
+    return new Promise((resolve, reject) => {
+        let list = getRegionInfoIncludeAllAsync()
+        resolve(list)
+    })
+}
+
 // 获取省份下拉框
 const getProvinceInfo = ({regionCode}) => {
     return new Promise((resolve, reject) => {
@@ -149,8 +157,8 @@ const getBuildingDetailById = requestFactory({
 export {
     getProvinceTable,
     getRegionInfo,
+    getRegionInfoIncludeAll,
     getRegionInfoAsync,
-    getRegionInfoExceptAllAsync,
     getProvinceInfo,
     getProvinceInfoAsync,
     getCityInfo,

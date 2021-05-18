@@ -39,7 +39,7 @@ export default class OverviewPage extends React.Component{
     }
 
     handleSearch(value){
-        console.log(value);
+        // console.log(value);
         this.setState({
             formData:value
         })
@@ -47,12 +47,12 @@ export default class OverviewPage extends React.Component{
 
 
     render() {
-        let searchBtnIcon = this.state.searchShow ? <DownOutlined/> : <UpOutlined />;
+        let searchBtnIcon = this.state.searchShow ? <UpOutlined /> : <DownOutlined/>;
         let searchFormStyle=this.state.searchShow ? {display:'block'}:{display: 'none'}
         let { formData } = this.state;
         // 默认展示近7天
         let initialValues = { 
-            timeRange:[moment().subtract(30, 'days'), moment()]
+            timeRange:[moment().subtract(1, 'year'), moment()]
         }
         return (
             <PageLayout title="商用智能VRV整体概况">
@@ -63,7 +63,7 @@ export default class OverviewPage extends React.Component{
                             <TimeRangeSelector required title="创建时间"/>
                         </div>
                         <div className="searchForm-row">
-                            <AreaSelector />
+                            <AreaSelector  ifAreaIncludeAll={true}/>
                         </div>
                     </SearchForm>
                 </div>

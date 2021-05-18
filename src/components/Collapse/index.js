@@ -20,7 +20,7 @@ export default class Collapse extends React.Component{
 
     render() {
         let buttonText = this.state.collapsed ? '展开':'收起'
-        let icon =  this.state.collapsed ? <UpOutlined/>:<DownOutlined/>
+        let icon =  this.state.collapsed ? <DownOutlined/> : <UpOutlined/>
         let className = this.state.collapsed ? 'collapse-box-collapsed':''
         let {title,children} = this.props
         return (

@@ -9,13 +9,13 @@ class ProjectProvinceCount extends React.Component{
         this.instance = null;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot){
-        let series = this.updateSeries();
-        let option = {
-            series: series
-        }
-        this.instance.setOption(option);
-    }
+    // componentDidUpdate(prevProps, prevState, snapshot){
+    //     let series = this.updateSeries();
+    //     let option = {
+    //         series: series
+    //     }
+    //     this.instance.setOption(option);
+    // }
 
 
     componentDidMount() {

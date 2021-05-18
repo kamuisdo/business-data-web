@@ -34,6 +34,7 @@ export default class EnergyMultiPage extends React.Component{
             ifShowAlert:false,
             data:null,  //请求回来的数据
             ifError:false,
+            ifNoData:false,
             ifShowNoSelectAlert:false,
             ifShowTypeErrAlert:false,
             ifShowSelectedLimitAlert:false
@@ -61,7 +62,9 @@ export default class EnergyMultiPage extends React.Component{
 
     loadData(){
         this.setState({
-            data:null
+            data:null,
+            ifError:false,
+            ifNoData:false
         })
         let chartFormData = this.state.chartFormData
         let type = this.state.targetType === '物件' ? 'build' : this.state.targetType === 'LC_No' ? 'terminal' : 'line'
@@ -69,9 +72,10 @@ export default class EnergyMultiPage extends React.Component{
         let query = Object.assign({},chartFormData,{ type,idList })
         api.getEnergyMultiLine(query).then((data)=>{
             data = data || []
-            this.setState({ data:data,ifError:false })
+            let ifNoData = data === null || (data && data.length === 0) || data === undefined
+            this.setState({ data:data,ifError:false,ifNoData })
         }).catch((err)=>{
-            this.setState({ ifError:true })
+            this.setState({ ifError:true,ifNoData:false })
         })
     }
 
@@ -160,7 +164,7 @@ export default class EnergyMultiPage extends React.Component{
 
     render() {
 
-        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert, ifShowTypeErrAlert,selected,data,ifError,formSelected } = this.state;
+        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert, ifShowTypeErrAlert,selected,data,ifError,formSelected,ifNoData } = this.state;
         // let formTargetType = tableFormData ? tableFormData.targetType : null;
         let hideFrom = targetType || '物件';
         let map = {
@@ -172,6 +176,7 @@ export default class EnergyMultiPage extends React.Component{
         // console.log('multi render');
         // console.log(selectProjectTableType);
         let selectedNameField = selectedTargetType==='物件' ? 'buildingName' : (selectedTargetType==='LcNo'?'lcNo':'lineName')
+        let selectedIdField = selectedTargetType === '物件' ? 'buildingId': (selectedTargetType==='LcNo'?'terminalId':'lineId')
         return (
             <PageLayout className="energy-multi-page">
                 <SearchForm buttonText="查询" onFinish={this.onFinishTableForm} >
@@ -211,7 +216,7 @@ export default class EnergyMultiPage extends React.Component{
                 }
 
                 <div className='chart-box'>
-                    { selected.length>0 && <SelectTableItem selected={selected} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
+                    { selected.length>0 && <SelectTableItem selected={selected} idField={selectedIdField} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
                     <SearchForm initialValues={{ unit: '天' }} onFinish={this.onFinishChartForm}>
                         <div className="searchForm-row">
                             <TimeRangeSelector required={true}/>
@@ -236,10 +241,10 @@ export default class EnergyMultiPage extends React.Component{
                     { (ifShowTypeErrAlert && targetType !== selectedTargetType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyLineMultiChart data={data} query={chartFormData} selected={formSelected}/>}
+                    { chartFormData===null || ifNoData ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyLineMultiChart data={data} query={chartFormData} selected={formSelected}/>}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyErrorLineMultiChart data={data} query={chartFormData} selected={formSelected}/>}
+                    { chartFormData===null || ifNoData ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyErrorLineMultiChart data={data} query={chartFormData} selected={formSelected}/>}
                 </div>
             </PageLayout>
         )

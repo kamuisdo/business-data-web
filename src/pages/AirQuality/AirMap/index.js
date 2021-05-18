@@ -9,6 +9,8 @@ import throttle from 'lodash/throttle'
 import uniq from 'lodash/uniq'
 import { Slider } from 'antd';
 import dayjs from "dayjs";
+import {ifNoData} from "../../../api/air";
+import NoChart from "../../../components/NoChart";
 
 class AirMap extends React.Component{
 
@@ -24,6 +26,7 @@ class AirMap extends React.Component{
     componentDidMount() {
         let { initEcharts,getOptionWithDefault,id,title,data,sensor,unitText } = this.props;
         let chartDom = document.getElementById(id);
+        if(!chartDom){ return; }
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
         let that = this;
@@ -283,11 +286,12 @@ class AirMap extends React.Component{
 
 
     render() {
-        let {id,data,handleRefresh} = this.props;
+        let {id,data,handleRefresh,title} = this.props;
         let {time} = this.state;
         console.log('--- rend ---');
+        console.log(data);
         let sliderKey = this.sliderKey;
-        return  (data===false) ? <ErrorChart handleClick={handleRefresh}/> : <div style={{position:'relative'}}>
+        return  (data===false) ? <ErrorChart handleClick={handleRefresh}/> : ifNoData(data) ? <><h4>{title}</h4><NoChart/></> : <div style={{position:'relative'}}>
             <div id={id} style={{height:'360px'}}></div>
             <div id={`${id}_xAxis`} style={{height:'80px',width:'calc(100% - 20px)',position:'absolute',zIndex:99,bottom: '-15px'}}></div>
             <span style={{ position:'absolute',bottom: '14px',color:'#7A8392'}}>{time}</span>

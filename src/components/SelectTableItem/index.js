@@ -15,10 +15,10 @@ export default class SelectTableItem extends React.Component{
     }
 
     formatSelected(){
-        let {selected=[],nameField="key"} = this.props
+        let {selected=[],idField="key"} = this.props
         // console.log(nameField);
         if(selected.length>1){
-            return uniqBy(selected,nameField)
+            return uniqBy(selected,idField)
         }
         return selected
     }

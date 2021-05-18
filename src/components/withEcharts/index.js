@@ -4,6 +4,7 @@ import deepmerge from "deepmerge";
 import isArray from 'lodash/isArray'
 import isPlainObject from 'lodash/isPlainObject'
 import ErrorChart from "../ErrorChart";
+import NoChart from "../NoChart";
 import chartColor from "../../enum/chartColor";
 
 function getDisplayName(WrappedComponent) {
@@ -39,7 +40,9 @@ export default function withEcharts(WrappedComponent){
             this.initEcharts = this.initEcharts.bind(this)
             this.getDefaultSeriesOpt = this.getDefaultSeriesOpt.bind(this)
             this.state = {
-                ifError:false
+                ifError:false,
+                ifNoData:false,
+                noDataDom:<NoChart/>
             }
             this.handleReload = this.handleReload.bind(this)
             // this.handleRef = this.handleRef.bind(this)
@@ -200,7 +203,8 @@ export default function withEcharts(WrappedComponent){
         }
 
         // echarts实例化
-        initEcharts(dom,theme=null,opt={locale:'ZH'}){
+        initEcharts(dom,theme=null,opt={}){
+            opt = Object.assign({locale:'ZH'},opt)
             let chart = echarts.init(dom,theme,opt);
             let resized = false;
             // 用于解决有些chart初始宽度无法正确取得
@@ -208,8 +212,12 @@ export default function withEcharts(WrappedComponent){
                 if(!resized){
                     let domWidth = chart.getDom().offsetWidth;
                     if(domWidth !== chart.getWidth()){
-                        chart.resize()
-                        resized = true
+                        try {
+                            chart.resize()
+                            resized = true
+                        }catch (e){
+                            console.log('resize failed')
+                        }
                     }
                 }
             })
@@ -249,21 +257,29 @@ export default function withEcharts(WrappedComponent){
                     // console.log(arg)
                     let instance = arg[0]
                     let params = arg[1]
+                    let option = arg[2] || {}
                     instance.showLoading()
                     return requestFn(params).then((data)=>{
                         instance.hideLoading();
+                        // 没有数据时，显示暂无数据
+                        let ifNoData = option.ifNoDataFn ? option.ifNoDataFn(data) : (data === null || (data && data.length === 0) || data === undefined)
+                        if(option.noDataDom){
+                            this.setState({ ifNoData:ifNoData,ifError:false,noDataDom:option.noDataDom })
+                        }else {
+                            this.setState({ ifNoData:ifNoData,ifError:false })
+                        }
                         return data
                     }).catch((err)=>{
                         console.log(`----- ${WithEcharts.displayName} requestFn Catch -----`)
                         instance.hideLoading();
-                        this.setState({ ifError:true })
+                        this.setState({ ifError:true,ifNoData:false })
                     })
                 }
             }
             let errorNode = <ErrorChart handleClick={this.handleReload}/>
             // console.log('-------- withEcharts render --------')
 
-            return this.state.ifError ? errorNode : <WrappedComponent {...rest}
+            return this.state.ifError ? errorNode : this.state.ifNoData ? this.state.noDataDom : <WrappedComponent {...rest}
                                                                       requestFn={tempFn}
                                                                       initEcharts={this.initEcharts}
                                                                       getDefaultSeriesOpt={this.getDefaultSeriesOpt}

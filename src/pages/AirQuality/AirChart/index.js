@@ -4,6 +4,8 @@ import chartColor from "../../../enum/chartColor";
 import PropTypes from 'prop-types'
 import ErrorChart from "../../../components/ErrorChart";
 import dayjs from 'dayjs'
+import { ifNoData } from '../../../api/air'
+import NoChart from "../../../components/NoChart";
 
 class Air extends React.Component{
 
@@ -14,8 +16,9 @@ class Air extends React.Component{
 
 
     componentDidMount() {
-        let { initEcharts,getOptionWithDefault,id,title,data,unitText } = this.props;
+        let { initEcharts,getOptionWithDefault,id,title,data,unitText,timeTypeFormat="YYYY/MM/DD" } = this.props;
         let chartDom = document.getElementById(id);
+        if(!chartDom){ return; }
         let myChart = initEcharts(chartDom);
         this.instance = myChart;
         if(data === null){
@@ -40,7 +43,7 @@ class Air extends React.Component{
             },
             tooltip: {
                 formatter: (params)=>{
-                    let date = dayjs(params[0].axisValueLabel).format('YYYY/MM/DD');
+                    let date = dayjs(params[0].axisValueLabel).format(timeTypeFormat);
                     let unitText = that.props.unitText;
                     let itemDom = params.map((v)=>{
                         let {seriesName,marker,data} = v
@@ -91,9 +94,11 @@ class Air extends React.Component{
     }
 
     render() {
-        let {id,data,handleRefresh} = this.props;
-
-        return  (data===false) ? <ErrorChart handleClick={handleRefresh}/> : <div id={id} style={{height:'360px'}}></div>
+        let {id,data,handleRefresh,title} = this.props;
+        console.log('----- AirChart -----')
+        console.log(data)
+        // console.log(ifNoData(data))
+        return  (data===false) ? <ErrorChart handleClick={handleRefresh}/> : ifNoData(data) ? <><h4>{title}</h4><NoChart/></> : <div id={id} style={{height:'360px'}}></div>
     }
 }
 

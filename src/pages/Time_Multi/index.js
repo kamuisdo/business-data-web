@@ -147,6 +147,7 @@ export default class TimeMultiPage extends React.Component{
         // console.log('multi render');
         // console.log(selectProjectTableType);
         let selectedNameField = selectedTargetType==='物件' ? 'buildingName' : (selectedTargetType==='LcNo'?'lcNo':'lineName')
+        let selectedIdField = selectedTargetType === '物件' ? 'buildingId': (selectedTargetType==='LcNo'?'terminalId':'lineId')
         return (
             <PageLayout className="energy-multi-page">
                 <SearchForm buttonText="查询" onFinish={this.onFinishTableForm} >
@@ -186,7 +187,7 @@ export default class TimeMultiPage extends React.Component{
                 }
 
                 <div className='chart-box'>
-                    { selected.length>0 && <SelectTableItem selected={selected} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
+                    { selected.length>0 && <SelectTableItem selected={selected} idField={selectedIdField} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
                     <SearchForm initialValues={{ unit: '天' }} onFinish={this.onFinishChartForm}>
                         <div className="searchForm-row">
                             <TimeRangeSelector required={true}/>

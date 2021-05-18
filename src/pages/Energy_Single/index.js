@@ -20,7 +20,8 @@ export default class EnergySinglePage extends React.Component{
         this.state = {
             formData:null,
             data:null,
-            ifError:false
+            ifError:false,
+            ifNoData:false
         }
     }
 
@@ -39,13 +40,16 @@ export default class EnergySinglePage extends React.Component{
 
     loadData(value){
         this.setState({
-            data:null
+            data:null,
+            ifNoData:false,
+            ifError:false
         })
         let query = Object.assign(value,{ type:0 })
         api.getEnergyBarChart(query).then((data)=>{
-            this.setState({ data:data,ifError:false })
+            let ifNoData = data === null || (data && data.length === 0) || data === undefined
+            this.setState({ data:data,ifError:false,ifNoData })
         }).catch((err)=>{
-            this.setState({ ifError:true })
+            this.setState({ ifError:true,ifNoData:false })
         })
     }
 
@@ -56,7 +60,7 @@ export default class EnergySinglePage extends React.Component{
     }
 
     render() {
-        let {formData,data,ifError} = this.state;
+        let {formData,data,ifError,ifNoData} = this.state;
         return (
             <PageLayout title="单器械电力消耗统计">
                 <div style={{display:'block'}}>
@@ -72,10 +76,10 @@ export default class EnergySinglePage extends React.Component{
                     </SearchForm>
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyBarChart data={data} query={formData}/>}
+                    { formData===null || ifNoData ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyBarChart data={data} query={formData}/>}
                </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyErrLineChart data={data} query={formData}/>}
+                    { formData===null || ifNoData ? <NoChart />: ifError ? <ErrorChart handleClick={this.handleErrorClick}/>:<EnergyErrLineChart data={data} query={formData}/>}
                 </div>
             </PageLayout>
         )

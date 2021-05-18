@@ -89,16 +89,15 @@ export default class SelectProjectTable extends React.Component{
                 }
             })
         }
-        // let pagination = {
-        //     pageSize:10
-        // }
-        let time = Date.now()
+        let pagination = {
+            pageSize:5
+        }
         return (<ProTable
             actionRef={actionRef}
             columns={columns}
             rowSelection={rowSelection}
             request={requestFn}
-            pagination={false}
+            pagination={pagination}
             search={false}
             options={false}
             tableAlertRender={false}

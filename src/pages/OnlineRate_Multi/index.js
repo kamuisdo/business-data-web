@@ -152,8 +152,8 @@ export default class OnlineRateMulti extends React.Component{
         let ifProvinceVisible = areaType === '市'
         let ifCityVisible = false;
         let selectedNameField = tempAreaType==='地区' ? 'area' : (tempAreaType==='省'?'province':'city')
+        let selectedIdField = 'key'
         let chartRegionType = areaType==='地区' ? 'region' : (areaType==='省'?'province':'city')
-
         return (
             <PageLayout className="online-rate-multi-page">
                 <SearchForm buttonText="查询" onFinish={this.onFinishTableForm} >
@@ -218,7 +218,7 @@ export default class OnlineRateMulti extends React.Component{
                 }
 
                 <div className='chart-box'>
-                    { selected.length>0 && <SelectTableItem selected={selected} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
+                    { selected.length>0 && <SelectTableItem selected={selected} idField={selectedIdField} nameField={selectedNameField} onRemoveItem={this.onRemoveItem}/> }
                     <SearchForm initialValues={{ unit: '天' }} onFinish={this.onFinishChartForm}>
                         <div className="searchForm-row">
                             <TimeRangeSelector required={true}/>

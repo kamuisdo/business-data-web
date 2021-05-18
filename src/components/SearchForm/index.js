@@ -43,7 +43,7 @@ export default class SearchForm extends React.Component{
                     <Form.Item>
                         <div style={{ paddingLeft:'70px' }}>
                             <Button type="primary" htmlType="submit">{buttonText}</Button>
-                            <Button type="text" onClick={this.handleReset}>重置</Button>
+                            <Button type="text" className="searchForm-reset-btn" onClick={this.handleReset}>重置</Button>
                         </div>
                     </Form.Item>
                 </Form>

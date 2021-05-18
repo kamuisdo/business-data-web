@@ -10,8 +10,20 @@ const getAirSensorData = requestFactory({
     mockUrl:'post/air/getCo2' 
 })
 
+const ifNoData = (data)=>{
+    // 初始化状态data=null 需要展示loading  所以直接返回false  生成chart的dom
+    if(data === null){ return  false }
+    // if(!data || data.length === 0){ return true }
+    let t = []
+    data.forEach((v)=>{
+        t = t.concat(v.data)
+    })
+    return t.length === 0
+}
+
 
 export {
     getCo2,
-    getAirSensorData
+    getAirSensorData,
+    ifNoData
 }

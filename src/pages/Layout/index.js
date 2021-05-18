@@ -58,7 +58,7 @@ export default class PageLayout extends React.Component {
         // 选中子菜单时，去掉key中的-single或者-multi得到submenu的key
         let openKeys = this.getOpenKeys()
         return (
-            <Layout style={{minHeight: "100vw"}}>
+            <Layout style={{minHeight: "100vh"}}>
                 <Sider theme="light" width="220px" trigger={null} collapsible collapsed={this.state.collapsed}>
                     <div className="layout-logo">{logoText}</div>
                     <Menu

@@ -75,6 +75,8 @@ class ProjectTypeCount extends React.Component{
     updateSeries(data){
         // let projectData = [69,130,12,115,586,3,150,65,122,58,40,51,20]
         // let sysData = [350,438,39,578,3561,43,936,761,1081,378,269,71,57]
+        // console.log(data)
+        if(!data){ return }
         let projectData = []
         let sysData = []
         projectTypeObjList.forEach((v,i)=>{

@@ -156,7 +156,7 @@ let sensorPosition = [
     // { no:'36',position:{x:15,y:1} },
     // { no:'32',position:{x:16,y:1} },
     // { no:'28',position:{x:17,y:1} },
-    
+    //
     // { no:'17',position:{x:1,y:0} },
     // { no:'20',position:{x:2,y:0} },
     // { no:'8',position:{x:3,y:0} },

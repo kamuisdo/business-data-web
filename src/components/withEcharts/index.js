@@ -277,7 +277,7 @@ export default function withEcharts(WrappedComponent){
                 }
             }
             let errorNode = <ErrorChart handleClick={this.handleReload}/>
-            // console.log('-------- withEcharts render --------')
+            console.log('-------- withEcharts render --------')
 
             return this.state.ifError ? errorNode : this.state.ifNoData ? this.state.noDataDom : <WrappedComponent {...rest}
                                                                       requestFn={tempFn}

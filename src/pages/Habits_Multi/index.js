@@ -13,6 +13,7 @@ import HabitsMultiChart from "./HabitsMultiChart";
 import * as api from '../../api/habits'
 import uniqBy from 'lodash/uniqBy';
 import config from '../../utils/config'
+import {getEnergyMultiLine} from "../../api/energy";
 
 const {Option} = Select
 
@@ -24,11 +25,13 @@ export default class HabitsMultiPage extends React.Component{
         this.state = {
             targetType:null,    // 随Selector修改的
             formTargetType:null,    // Tableform点击查询之后再修改
+            chartFormTargetType:null,   // 点击生成表格之后才会变化
             selectedTargetType:null,    // 点击了添加之后再修改
             tableFormData:null,
             chartFormData:null,
             chartData:null,
             selected:[],
+            formSelected:[],    // chart根据此字段变更
             ifShowNoSelectAlert:false,
             ifShowTypeErrAlert:false,
             ifShowSelectedLimitAlert:false
@@ -104,6 +107,7 @@ export default class HabitsMultiPage extends React.Component{
     }
 
     onFinishChartForm(chartFormData){
+        console.log('----- onFinishChartForm -----')
         if(this.state.selected.length === 0){
             this.setState({
                 ifShowNoSelectAlert:true
@@ -116,9 +120,14 @@ export default class HabitsMultiPage extends React.Component{
             })
             return
         }
+        let formSelected = this.state.selected
+        let chartFormTargetType = this.state.targetType
         this.setState({
-            chartFormData
+            chartFormData,
+            formSelected,
+            chartFormTargetType
         })
+        // this.loadData()
     }
 
     ifSelectedOverLimit(selected){
@@ -130,7 +139,7 @@ export default class HabitsMultiPage extends React.Component{
 
     render() {
 
-        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert, ifShowTypeErrAlert,selected } = this.state;
+        let { targetType,formTargetType,chartFormTargetType,selectedTargetType,tableFormData,formSelected,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert, ifShowTypeErrAlert,selected } = this.state;
         // let formTargetType = tableFormData ? tableFormData.targetType : null;
         let hideFrom = targetType || '物件';
         let map = {
@@ -143,6 +152,14 @@ export default class HabitsMultiPage extends React.Component{
         // console.log(selectProjectTableType);
         let selectedNameField = selectedTargetType==='物件' ? 'buildingName' : (selectedTargetType==='LcNo'?'lcNo':'lineName')
         let selectedIdField = selectedTargetType === '物件' ? 'buildingId': (selectedTargetType==='LcNo'?'terminalId':'lineId')
+        // let getMultiEnergyAndHabits = (query)=>{
+        //     // query.idList = query[selectedIdField]
+        //     return Promise.all([
+        //         getEnergyMultiLine(query).then((data)=>{ return { energy:data } }),
+        //         api.getHabitsMultiLine(query).then((data)=>{ return { habit:data } })
+        //     ])
+        // }
+
         return (
             <PageLayout className="energy-multi-page">
                 <SearchForm buttonText="查询" onFinish={this.onFinishTableForm} >
@@ -193,7 +210,8 @@ export default class HabitsMultiPage extends React.Component{
                     { ifShowSelectedLimitAlert && <Alert message={`选择的对象不可超过${config.selectedItemLimit}个`} type="warning" showIcon /> }
                     { (ifShowTypeErrAlert && targetType !== selectedTargetType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
-                { chartFormData===null ? <div className='chart-box'><NoChart/></div> : <HabitsMultiChart requestFn={api.getHabitsMultiLine} selected={selected} query={chartFormData} type={targetType} /> }
+                { chartFormData===null ? <div className='chart-box'><NoChart/></div> : <HabitsMultiChart requestFn={api.getHabitsMultiLine} selected={formSelected} query={chartFormData} type={chartFormTargetType} /> }
+                {/*<HabitsMultiChart requestFn={getMultiEnergyAndHabits} selected={formSelected} query={chartFormData} type={chartFormTargetType} />*/}
             </PageLayout>
         )
     }

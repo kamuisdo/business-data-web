@@ -25,6 +25,7 @@ export default class TimeMultiPage extends React.Component{
         this.state = {
             targetType:null,    // 随Selector修改的
             formTargetType:null,    // Tableform点击查询之后再修改
+            chartFormTargetType:null,   // 点击生成表格之后才会变化
             selectedTargetType:null,    // 点击了添加之后再修改
             tableFormData:null,
             chartFormData:null,
@@ -119,9 +120,11 @@ export default class TimeMultiPage extends React.Component{
             return
         }
         let formSelected = this.state.selected
+        let chartFormTargetType = this.state.targetType
         this.setState({
             chartFormData,
-            formSelected
+            formSelected,
+            chartFormTargetType
         })
     }
 
@@ -135,7 +138,7 @@ export default class TimeMultiPage extends React.Component{
 
     render() {
 
-        let { targetType,formTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert,ifShowTypeErrAlert,selected,formSelected } = this.state;
+        let { targetType,formTargetType,chartFormTargetType,selectedTargetType,tableFormData,chartFormData,ifShowNoSelectAlert,ifShowSelectedLimitAlert,ifShowTypeErrAlert,selected,formSelected } = this.state;
         // let formTargetType = tableFormData ? tableFormData.targetType : null;
         let hideFrom = targetType || '物件';
         let map = {
@@ -199,10 +202,10 @@ export default class TimeMultiPage extends React.Component{
                     { (ifShowTypeErrAlert && targetType !== selectedTargetType) && <Alert message="已选对象的类型和需要比较的对象类型不一致" type="warning" showIcon />}
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <RunTimeDayMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={formSelected} query={chartFormData}/> }
+                    { chartFormData===null ? <NoChart/> : <RunTimeDayMultiChart requestFn={api.getRunTimeMulti} type={chartFormTargetType} selected={formSelected} query={chartFormData}/> }
                 </div>
                 <div className="chart-box">
-                    { chartFormData===null ? <NoChart/> : <RunTimeHoursMultiChart requestFn={api.getRunTimeMulti} type={targetType} selected={formSelected} query={chartFormData}/> }
+                    { chartFormData===null ? <NoChart/> : <RunTimeHoursMultiChart requestFn={api.getRunTimeMulti} type={chartFormTargetType} selected={formSelected} query={chartFormData}/> }
                 </div>
             </PageLayout>
         )

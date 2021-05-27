@@ -52,22 +52,17 @@ class HabitsSingle extends React.Component{
     loadData(){
         let {query,requestFn} = this.props;
         return requestFn(this.instance,query).then((data)=>{
-            // let format = TimeTypeEnum.get(query.timeType).format
-            // let setTemper = []
-            // let returnTemper = []
-            // let energy = []
-            // data = data.map((v)=>{ 
-            //     let t = dayjs(v.RECORD_DATE).unix()
-            //     v.time = t
+            // 合并电量
+            // let energy = data[0].energy || data[1].energy
+            // let habit = data[0].habit || data[1].habit
+            // habit = habit.map((v)=>{
+            //     let energyData = energy.find((item)=>{ return item.recordDate === (v.RECORD_DATE || v.recordDate) })
+            //     let thisEnergy = energyData ? (energyData.coldElectric + energyData.hotElectric) : null
+            //     v.energy = thisEnergy
             //     return v
             // })
-            // data = data.sort((a,b)=>{ return a.time - b.time })
-            // data.forEach((v)=>{    
-            //     let time =  dayjs(v.RECORD_DATE).format(format)
-            //     setTemper.push([time,v.artmp])
-            //     returnTemper.push([time,v.arsut])
-            //     energy.push([time,v.sew])
-            // })
+            // let formattedData = formatHabitsData(habit,query)
+
             let formattedData = formatHabitsData(data,query)
             this.updateSeries(formattedData)
         })
@@ -89,16 +84,16 @@ class HabitsSingle extends React.Component{
                 showSymbol: false,
                 data:setTemper
             },
-            {
-                name:'耗电量',
-                type:'line',
-                yAxisIndex:1,
-                itemStyle: {
-                    color: '#2B6AFF',
-                },
-                showSymbol: false,
-                data:energy
-            },
+            // {
+            //     name:'耗电量',
+            //     type:'line',
+            //     yAxisIndex:1,
+            //     itemStyle: {
+            //         color: '#2B6AFF',
+            //     },
+            //     showSymbol: false,
+            //     data:energy
+            // },
             {
                 name:'回风温度',
                 type: 'line',

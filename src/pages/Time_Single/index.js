@@ -6,6 +6,7 @@ import ProjectCascadeSelector from "../../components/ProjectCascadeSelector";
 import NoChart from "../../components/NoChart";
 import PageLayout from "../Layout";
 import * as api from '../../api/runtime'
+import {getEnergyBarChart} from '../../api/energy'
 import RunTimeSingleBarChart from "./RunTimeSingleBartChart";
 import RunTimeHoursBarChart from "./RunTimeHoursBarChart";
 
@@ -26,8 +27,16 @@ export default class TimeSinglePage extends React.Component{
     }
 
 
+    getRunTimeAndTemper(){}
+
     render() {
         let {formData} = this.state;
+        let getRunTimeAndTemper = (query)=>{
+            return Promise.all([
+                getEnergyBarChart(query).then((data)=>{ return { temper:data } }),
+                api.getRunTimeBarChart(query).then((data)=>{ return { time:data } })
+            ])
+        }
         return (
             <PageLayout title="单物件运转统计">
                 <div style={{display:'block'}}>
@@ -43,7 +52,7 @@ export default class TimeSinglePage extends React.Component{
                     </SearchForm>
                 </div>
                 <div className="chart-box">
-                    { formData===null ? <NoChart />: <RunTimeSingleBarChart requestFn={api.getRunTimeBarChart} query={formData} />}
+                    { formData===null ? <NoChart />: <RunTimeSingleBarChart requestFn={getRunTimeAndTemper} query={formData} />}
                 </div>
                 <div className="chart-box">
                     { formData===null ? <NoChart />: <RunTimeHoursBarChart requestFn={api.getRunTimeBarChart} query={formData} />}

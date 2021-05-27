@@ -1,6 +1,5 @@
 import './App.less';
-import Login from "./pages/login/Login";
-import Demo from "./pages/Demo";
+import Login from './pages/Login'
 import OverviewPage from "./pages/Overview";
 import OnlineRateSinglePage from './pages/OnlineRate_Single'
 import OnlineRateMulti from "./pages/OnlineRate_Multi";
@@ -19,6 +18,27 @@ import {
     Redirect
 } from "react-router-dom";
 import 'antd/dist/antd.css';
+import store from 'store'
+import storeKeyName from "./utils/storeKeyName";
+
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+    <Route
+        {...rest}
+        render={props =>
+            !!store.get(storeKeyName.token) ? (
+                <Component {...props} />
+            ) : (
+                <Redirect
+                    to={{
+                        pathname: "/login",
+                        state: { from: props.location }
+                    }}
+                />
+            )
+        }
+    />
+);
 
 function App() {
     return (
@@ -27,42 +47,32 @@ function App() {
             <Route path="/login">
                 <Login/>
             </Route>
+            {/*<PrivateRoute path="/overview" component={OverviewPage} />*/}
             <Route path="/overview">
                 <OverviewPage/>
             </Route>
-            <Route path="/online-rate-single">
-                <OnlineRateSinglePage/>
-            </Route>
-            <Route path="/online-rate-multi">
-                <OnlineRateMulti/>
-            </Route>
-            <Route path="/energy-single">
-                <EnergySinglePage/>
-            </Route>
-            <Route path="/energy-multi">
-                <EnergyMultiPage/>
-            </Route>
-            <Route path="/time-single">
-                <TimeSinglePage/>
-            </Route>
-            <Route path="/time-multi">
-                <TimeMultiPage/>
-            </Route>
-            <Route path="/habits-single">
-                <HabitsSinglePage/>
-            </Route>
-            <Route path="/habits-multi">
-                <HabitsMultiPage/>
-            </Route>
-            <Route path="/project-query">
-                <ProjectQueryPage/>
-            </Route>
-            <Route path="/air-quality">
-                <AirQualityPage/>
-            </Route>
-            <Route>
-                <NotFound/>
-            </Route>
+            <PrivateRoute path="/online-rate-single" component={OnlineRateSinglePage} />
+
+            <PrivateRoute path="/online-rate-multi" component={OnlineRateMulti} />
+
+            <PrivateRoute path="/energy-single" component={EnergySinglePage} />
+
+            <PrivateRoute path="/energy-multi" component={EnergyMultiPage} />
+
+            <PrivateRoute path="/time-single" component={TimeSinglePage} />
+
+            <PrivateRoute path="/time-multi" component={TimeMultiPage} />
+
+            <PrivateRoute path="/habits-single" component={HabitsSinglePage} />
+
+            <PrivateRoute path="/habits-multi" component={HabitsMultiPage} />
+
+            <PrivateRoute path="/project-query" component={ProjectQueryPage} />
+
+            <PrivateRoute path="/air-quality" component={AirQualityPage} />
+
+            <PrivateRoute component={NotFound} />
+
         </Switch>
     );
 }

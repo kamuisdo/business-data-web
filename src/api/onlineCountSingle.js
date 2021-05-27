@@ -21,6 +21,8 @@ const formatDataByType = (value,data)=>{
      let onKey = value.type === '物件' ? 'buildingOnNum' :'lineOnNum';
      let sumKey = value.type === '物件' ? 'buildingNum' :'lineNum';
      let format = TimeTypeEnum.get(value.timeType).format;
+     let formatFn = TimeTypeEnum.get(value.timeType).formatFn;
+    data = data.sort((a,b)=>{ return a.recordDate - b.recordDate })
      let t = data.map((v)=>{
          return {
              cold:v[coldKey],
@@ -28,11 +30,12 @@ const formatDataByType = (value,data)=>{
              on:v[onKey],
              sum:v[sumKey],
              maxWeather:v.maxWeather,
-             recordDate:dayjs(v.recordDate).format(format)
+             // recordDate:dayjs(v.recordDate).format(format),
+             recordDate:formatFn(v.recordDate)
          }
      })
-    console.log(data)
-    console.log(t)
+    // console.log(data)
+    // console.log(t)
      return t
 }
 

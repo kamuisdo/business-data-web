@@ -48,7 +48,7 @@ class RunTimeHoursBar extends React.Component{
 
     loadData(){
         let {query,requestFn} = this.props;
-        query.timeType = 'hour'
+        query = Object.assign({},query,{ timeType:'hour' })
         return requestFn(this.instance,query).then((data)=>{
             data = formatTimeDataToHour(data)
             this.updateSeries(data)

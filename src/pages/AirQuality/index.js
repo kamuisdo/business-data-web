@@ -103,76 +103,76 @@ let sensorMacId = [
 let sensorPosition = [
     { no:'test1',position:{x:0,y:4} },
     { no:'test2',position:{x:1,y:4} },
-    // { no:'87',position:{x:0,y:3} },
-    // { no:'85',position:{x:1,y:3} },
-    // { no:'11',position:{x:2,y:3} },
-    // { no:'6',position:{x:3,y:3} },
-    // { no:'82',position:{x:5,y:3} },
-    // { no:'78',position:{x:6,y:3} },
-    // { no:'80',position:{x:7,y:3} },
-    // { no:'72',position:{x:8,y:3} },
-    // { no:'63',position:{x:9,y:3} },
-    // { no:'65',position:{x:10,y:3} },
-    // { no:'56',position:{x:11,y:3} },
-    // { no:'57',position:{x:12,y:3} },
-    // { no:'59',position:{x:13,y:3} },
-    // { no:'42',position:{x:14,y:3} },
-    // { no:'38',position:{x:15,y:3} },
-    // { no:'35',position:{x:16,y:3} },
-    // { no:'30',position:{x:17,y:3} },
-    // //
-    // { no:'86',position:{x:0,y:2} },
-    // { no:'4',position:{x:1,y:2} },
-    // { no:'26',position:{x:2,y:2} },
-    // { no:'3',position:{x:3,y:2} },
-    // { no:'84',position:{x:5,y:2} },
-    // { no:'77',position:{x:6,y:2} },
-    // { no:'81',position:{x:7,y:2} },
-    // { no:'71',position:{x:8,y:2} },
-    // { no:'76',position:{x:9,y:2} },
-    // { no:'62',position:{x:10,y:2} },
-    // { no:'52',position:{x:11,y:2} },
-    // { no:'53',position:{x:12,y:2} },
-    // { no:'55',position:{x:13,y:2} },
-    // { no:'41',position:{x:14,y:2} },
-    // { no:'37',position:{x:15,y:2} },
-    // { no:'34',position:{x:16,y:2} },
-    // { no:'29',position:{x:17,y:2} },
-    // //
-    // { no:'14',position:{x:1,y:1} },
-    // { no:'23',position:{x:2,y:1} },
-    // { no:'7',position:{x:3,y:1} },
-    // { no:'5',position:{x:4,y:1} },
-    // { no:'79',position:{x:5,y:1} },
-    // { no:'70',position:{x:6,y:1} },
-    // { no:'69',position:{x:7,y:1} },
-    // { no:'73',position:{x:8,y:1} },
-    // { no:'64',position:{x:9,y:1} },
-    // { no:'60',position:{x:10,y:1} },
-    // { no:'68',position:{x:11,y:1} },
-    // { no:'54',position:{x:12,y:1} },
-    // { no:'51',position:{x:13,y:1} },
-    // { no:'40',position:{x:14,y:1} },
-    // { no:'36',position:{x:15,y:1} },
-    // { no:'32',position:{x:16,y:1} },
-    // { no:'28',position:{x:17,y:1} },
+    { no:'87',position:{x:0,y:3} },
+    { no:'85',position:{x:1,y:3} },
+    { no:'11',position:{x:2,y:3} },
+    { no:'6',position:{x:3,y:3} },
+    { no:'82',position:{x:5,y:3} },
+    { no:'78',position:{x:6,y:3} },
+    { no:'80',position:{x:7,y:3} },
+    { no:'72',position:{x:8,y:3} },
+    { no:'63',position:{x:9,y:3} },
+    { no:'65',position:{x:10,y:3} },
+    { no:'56',position:{x:11,y:3} },
+    { no:'57',position:{x:12,y:3} },
+    { no:'59',position:{x:13,y:3} },
+    { no:'42',position:{x:14,y:3} },
+    { no:'38',position:{x:15,y:3} },
+    { no:'35',position:{x:16,y:3} },
+    { no:'30',position:{x:17,y:3} },
     //
-    // { no:'17',position:{x:1,y:0} },
-    // { no:'20',position:{x:2,y:0} },
-    // { no:'8',position:{x:3,y:0} },
-    // { no:'9',position:{x:4,y:0} },
-    // { no:'83',position:{x:5,y:0} },
-    // { no:'74',position:{x:7,y:0} },
-    // { no:'75',position:{x:8,y:0} },
-    // { no:'66',position:{x:9,y:0} },
-    // { no:'67',position:{x:10,y:0} },
-    // { no:'61',position:{x:11,y:0} },
-    // { no:'58',position:{x:12,y:0} },
-    // { no:'43',position:{x:13,y:0} },
-    // { no:'39',position:{x:14,y:0} },
-    // { no:'33',position:{x:15,y:0} },
-    // { no:'31',position:{x:16,y:0} },
-    // { no:'1',position:{x:17,y:0} }
+    { no:'86',position:{x:0,y:2} },
+    { no:'4',position:{x:1,y:2} },
+    { no:'26',position:{x:2,y:2} },
+    { no:'3',position:{x:3,y:2} },
+    { no:'84',position:{x:5,y:2} },
+    { no:'77',position:{x:6,y:2} },
+    { no:'81',position:{x:7,y:2} },
+    { no:'71',position:{x:8,y:2} },
+    { no:'76',position:{x:9,y:2} },
+    { no:'62',position:{x:10,y:2} },
+    { no:'52',position:{x:11,y:2} },
+    { no:'53',position:{x:12,y:2} },
+    { no:'55',position:{x:13,y:2} },
+    { no:'41',position:{x:14,y:2} },
+    { no:'37',position:{x:15,y:2} },
+    { no:'34',position:{x:16,y:2} },
+    { no:'29',position:{x:17,y:2} },
+    //
+    { no:'14',position:{x:1,y:1} },
+    { no:'23',position:{x:2,y:1} },
+    { no:'7',position:{x:3,y:1} },
+    { no:'5',position:{x:4,y:1} },
+    { no:'79',position:{x:5,y:1} },
+    { no:'70',position:{x:6,y:1} },
+    { no:'69',position:{x:7,y:1} },
+    { no:'73',position:{x:8,y:1} },
+    { no:'64',position:{x:9,y:1} },
+    { no:'60',position:{x:10,y:1} },
+    { no:'68',position:{x:11,y:1} },
+    { no:'54',position:{x:12,y:1} },
+    { no:'51',position:{x:13,y:1} },
+    { no:'40',position:{x:14,y:1} },
+    { no:'36',position:{x:15,y:1} },
+    { no:'32',position:{x:16,y:1} },
+    { no:'28',position:{x:17,y:1} },
+
+    { no:'17',position:{x:1,y:0} },
+    { no:'20',position:{x:2,y:0} },
+    { no:'8',position:{x:3,y:0} },
+    { no:'9',position:{x:4,y:0} },
+    { no:'83',position:{x:5,y:0} },
+    { no:'74',position:{x:7,y:0} },
+    { no:'75',position:{x:8,y:0} },
+    { no:'66',position:{x:9,y:0} },
+    { no:'67',position:{x:10,y:0} },
+    { no:'61',position:{x:11,y:0} },
+    { no:'58',position:{x:12,y:0} },
+    { no:'43',position:{x:13,y:0} },
+    { no:'39',position:{x:14,y:0} },
+    { no:'33',position:{x:15,y:0} },
+    { no:'31',position:{x:16,y:0} },
+    { no:'1',position:{x:17,y:0} }
 ].map((v,i)=>{
     let mac = sensorMacId.find((t)=>{ return t.no === v.no }).mac;
     let name = `传感器${v.no}`
@@ -232,7 +232,9 @@ export default class AirQualityPage extends React.Component{
             temperData:null, 
             humidityData:null
         })
-        let sensorList = sensor.map((v)=>{ return v.mac})
+        let sensorList = sensor
+            // .filter((v)=>{ return !v.disabled })
+            .map((v)=>{ return v.mac})
         // 默认按照小时显示
         let timeType = this.timeType
         let timeTypeFormat = this.timeTypeFormat
@@ -256,25 +258,29 @@ export default class AirQualityPage extends React.Component{
             sensor.forEach((v)=>{
                 // 应该能找到多个时间的数据
                 let thisSensorData = data.filter((t)=>{ return v.mac === t.sensorMac })
-                if(thisSensorData.length > 0){
-                    console.log(v.mac);
-                    console.log(thisSensorData.length);
-                }
+                // if(thisSensorData.length > 0){
+                //     console.log(v.mac);
+                //     console.log(thisSensorData.length);
+                // }
                 // timeList = timeList.concat(thisSensorData.map((v)=>{return v.collectTime}))
                 co2Data.push({
                     name:v.name,
+                    disabled:v.disabled,
                     data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.co2] })
                 })
                 pm25Data.push({
                     name:v.name,
+                    disabled:v.disabled,
                     data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.pm25] })
                 })
                 temperData.push({
                     name:v.name,
-                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.temp1] })
+                    disabled:v.disabled,
+                    data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.temp] })
                 })
                 humidityData.push({
                     name:v.name,
+                    disabled:v.disabled,
                     data:thisSensorData.map((t)=>{ return [dayjs(t.collectTime).format(timeTypeFormat),t.humidity] })
                 })
                 // return Object.assign({},v,{ data:thisSensorData })
@@ -340,8 +346,7 @@ export default class AirQualityPage extends React.Component{
     handleItemEnable(name){
         let {co2Data,pm25Data,temperData,humidityData,sensor} = this.state;
         // 在有数据loading的时候，不可点击item
-        if(co2Data&&pm25Data&&temperData&&humidityData
-        ){
+        if(co2Data&&pm25Data&&temperData&&humidityData){
             // 找到这个sensor修改数据
             let newSensor = sensor.map((v)=>{
                 if(v.name === name){

@@ -50,9 +50,9 @@ export default class OnlineRateSinglePage extends React.Component{
         })
         let query = Object.assign(value,{ type:0 })
         api.onlineCountBar(query).then((data)=>{
-            let formatedData = api.formatDataByType(value,data)
+            let formattedData = api.formatDataByType(value,data)
             let ifNoData = data === null || (data && data.length === 0) || data === undefined
-            this.setState({ data:formatedData,ifError:false,ifNoData })
+            this.setState({ data:formattedData,ifError:false,ifNoData })
         }).catch((err)=>{
             this.setState({ ifError:true,ifNoData:false })
         })

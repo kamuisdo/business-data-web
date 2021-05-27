@@ -1,8 +1,9 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu,Button } from 'antd';
 import {
     MenuUnfoldOutlined,
-    MenuFoldOutlined
+    MenuFoldOutlined,
+    LogoutOutlined
 } from '@ant-design/icons';
 import './index.less';
 import './ant_reset.less'
@@ -16,13 +17,16 @@ import time_icon from '../../assets/icon/运转时间@2x.png'
 import habits_icon from '../../assets/icon/使用习惯@2x.png'
 import aq_icon from '../../assets/icon/空气质量@2x.png'
 import search_icon from '../../assets/icon/物件查询@2x.png'
+import store from 'store'
+import storeKeyName from "../../utils/storeKeyName";
+import { withRouter } from 'react-router-dom'
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 
 
 
-export default class PageLayout extends React.Component {
+class PageLayout extends React.Component {
     state = {
         collapsed: false,
         defaultSelectedKeys:[window.location.hash.split('#/')[1]],
@@ -51,12 +55,23 @@ export default class PageLayout extends React.Component {
         }
     }
 
+    onLogOut = () => {
+        // TODO 调用登出接口
+        // 清除store里面的值
+        store.set(storeKeyName.token,null)
+        store.set(storeKeyName.user,null)
+        let { history } = this.props
+        history.push({pathname: '/login'})
+    }
+
     render() {
         let { title,className='' } = this.props;
         let toggleBtn = <span onClick={this.toggle} className="trigger" style={{padding:'24px'}}>{this.state.collapsed ? <MenuUnfoldOutlined/> :<MenuFoldOutlined/>}</span>
         let logoText = this.state.collapsed ? <img src={logo_shu}/>:<img src={logo_heng}/>;
         // 选中子菜单时，去掉key中的-single或者-multi得到submenu的key
         let openKeys = this.getOpenKeys()
+        let user = store.get(storeKeyName.user)
+        let userName = user ? user.loginName : '未登录'
         return (
             <Layout style={{minHeight: "100vh"}}>
                 <Sider theme="light" width="220px" trigger={null} collapsible collapsed={this.state.collapsed}>
@@ -103,13 +118,23 @@ export default class PageLayout extends React.Component {
                 <Layout className="site-layout">
                     <Header className="site-layout-background" style={{ padding: 0 }}>
                         {toggleBtn}
+                        <div className="header-right-box">
+                            {/*<img className="avatar" src={store.get('userAvatar')}/>*/}
+                            <p className="header-userName">{userName}</p>
+                            <Button type="link" onClick={this.onLogOut} icon={<LogoutOutlined style={{ color:'#333' }} />}></Button>
+                        </div>
                     </Header>
                     <Content className={`site-layout-background site-layout-content ${className}`}>
-                        { title&&title.length>0 && <h3 className="contentTitle">{title}</h3> }
-                        {this.props.content ? this.props.content : this.props.children}
+                        <div className="site-layout-content-wrapper">
+                            { title&&title.length>0 && <h3 className="contentTitle">{title}</h3> }
+                            {this.props.content ? this.props.content : this.props.children}
+                        </div>
+
                     </Content>
                 </Layout>
             </Layout>
         );
     }
 }
+
+export default withRouter(PageLayout)

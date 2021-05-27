@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from 'prop-types';
 import isArray from 'lodash/isArray'
-
+import FormContext from '../SearchForm/formContext'
+import EE from "../../utils/eventEmitter";
+import eventName from '../../utils/eventName'
 
 import {Button,Divider, Select} from "antd";
 
@@ -10,7 +12,7 @@ const {Option} = Select;
 // 递归调用cascadeByList
 function cascadeAll(byList,currentVal){
     if(byList && byList.length > 0){
-        byList.map((ref)=>{
+        byList.forEach((ref)=>{
             if(ref&&ref.current&&ref.current.cascadeChange){
                 ref.current.cascadeChange(currentVal);
                 cascadeAll(ref.current.props.cascadeBy,null)
@@ -22,16 +24,36 @@ function cascadeAll(byList,currentVal){
 /**
  * 包装ant Select 请求远程API，显示loading，搜索时加入节流
  */
-export default class ApiSelect extends React.Component{
+class ApiSelect extends React.Component{
 
     constructor(props) {
         super(props);
         let {cascading,disabled,initialParams,cascadeParams} = this.props;
         // 取到初始的cascading的值
+        // 优先读取 this.context.current  FormRef的值
+        // let cascadingVal = null
+        // if(cascading){
+        //     if(this.context && this.context.current){
+        //         cascadingVal = this.context.current.getFieldValue(cascadingField)
+        //         return
+        //     }
+        //     if(cascading.current && cascading.current.state){
+        //         cascadingVal = cascading.current.state
+        //         return
+        //     }
+        // }
         let cascadingVal = cascading && cascading.current && cascading.current.state ? cascading.current.state.value : null;
         this.cascadingVal = cascadingVal;
         // 判断初始的cascadingVal是否有值
+        // console.log('------ ApiSelect constructor ------')
         let hasCascadingVal = cascadingVal !== undefined && cascadingVal !== null
+        // console.log(this.context)
+        // if(this.context && this.context.current){
+        //     console.log(this.context.current.getFieldsValue(true))
+        // }
+
+        // console.log(cascadingVal)
+        // console.log(hasCascadingVal);
         this.hasCascadingVal = hasCascadingVal;
         this.state = {
             loading:hasCascadingVal, // 没有联动的话就直接请求数据
@@ -51,13 +73,29 @@ export default class ApiSelect extends React.Component{
     }
 
 
+
     componentDidMount() {
         // console.log(this.hasCascadingVal)
         let {cascading} = this.props;
         if(!cascading || this.hasCascadingVal){
             this.loadData()
         }
+        // console.log('------ ApiSelect componentDidMount ------')
+        // console.log(this.context.formRefs)
+        // 如果selector是处于form中，则监听form的重置事件
+        if(this.context && this.context.formId){
+            EE.on(`${eventName.FormRestPrefix}${this.context.formId}`,()=>{
+                // console.log(`------ ApiSelect 重置 ${eventName.FormRestPrefix}${this.context.formId} ------`)
+                let {cascading,disabled} = this.props;
+                let apiDisabled = cascading ? true : disabled
+                this.setState({
+                    apiDisabled,
+                    value:null
+                })
+            })
+        }
     }
+
 
 
     loadData(){
@@ -86,18 +124,40 @@ export default class ApiSelect extends React.Component{
         })
     }
 
+    resetFormVal(){
+        let { valueField,formfield } = this.props
+        let field = formfield || valueField
+        if(this.context && this.context.formRefs.current){
+            // console.log(`----- 重置form的值 ${field}-----`)
+            this.context.formRefs.current.setFieldsValue({ [field]:undefined })
+        }
+    }
+
     // 需要被联动组件ref调用
     cascadeChange(value){
         // console.log(`---- ${this.props.id} cascadeChange ----`)
+        // console.log(value)
+        // console.log(this.context)
         if(!value){
             this.setState({
                 apiDisabled:true,
                 value:null, // 加载成功之后重置原来的选中的值
             })
+            // 重置form的值，使得从form取值时可以取到
+            this.resetFormVal()
+            // let { valueField } = this.props
+            // if(this.context && this.context.current && this.context.current.setFieldsValue){
+            //     console.log(`----- 重置form的值 ${valueField}-----`)
+            //     this.context.current.setFieldsValue({ [valueField]:undefined })
+            // }
         }else {
             let params = this.props.cascadeParams ? this.props.cascadeParams(value): {};
             this.cascadeParamsData = params
             this.loadData()
+            let {cascading} = this.props
+            if(cascading){
+                this.resetFormVal()
+            }
         }
     }
 
@@ -175,12 +235,16 @@ export default class ApiSelect extends React.Component{
     }
 }
 
+ApiSelect.contextType = FormContext;
+
 ApiSelect.propTypes = {
     valueField:PropTypes.string.isRequired,
     textField:PropTypes.string.isRequired,
     requestFn:PropTypes.func.isRequired,
+    formfield:PropTypes.string, // 在表单中的field
     query:PropTypes.object,
     cascading:PropTypes.object,   // 根据那个APISelect的实例联动，refs对象
+    cascadingField:PropTypes.string,    // 根据那个APISelect的实例联动，formfield的值
     cascadeBy:PropTypes.array,   // 被那些组件联动
     cascadeParams:PropTypes.func,   // 获取联动组件的请求参数，返回对象
 }
@@ -190,3 +254,4 @@ ApiSelect.defaultProps = {
     textField:'value'
 }
 
+export default ApiSelect

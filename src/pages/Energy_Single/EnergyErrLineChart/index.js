@@ -3,6 +3,7 @@ import withEcharts from "../../../components/withEcharts";
 import {TimeTypeEnum} from '../../../enum/timeType';
 import config from '../../../utils/config';
 import dayjs from 'dayjs';
+import isNumber from 'lodash/isNumber'
 
 class EnergyErrLine extends React.Component{
 
@@ -44,6 +45,12 @@ class EnergyErrLine extends React.Component{
 
     }
 
+    // 计算EER的值
+    calcEER(v1,v2){
+        if(v2 === 0){ return 0 }
+        let t = v1/v2/config.err_day_params
+        return isNumber(t) ? t.toFixed(2) : '-'
+    }
 
     // 设置line的参数
     updateSeries(data){
@@ -51,13 +58,13 @@ class EnergyErrLine extends React.Component{
             return []
         }
         let {getDefaultSeriesOpt,query} = this.props;
-        let format = TimeTypeEnum.get(query.timeType).format;
+        let formatFn = TimeTypeEnum.get(query.timeType).formatFn;
         let cold = []
         let hot = []
         data.forEach((v)=>{
-            let time = dayjs(v.recordDate).format(format)
-            cold.push([time,(v.coolCapacity/v.coldElectric/config.err_day_params).toFixed(1)])
-            hot.push([time,(v.heatCapacity/v.hotElectric/config.err_day_params).toFixed(1)])
+            let time = formatFn(v.recordDate)
+            cold.push([time,this.calcEER(v.coolCapacity,v.coldElectric)])
+            hot.push([time,this.calcEER(v.heatCapacity,v.hotElectric)])
         })
         
         let series = [

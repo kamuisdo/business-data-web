@@ -95,6 +95,7 @@ class ChinaMap extends React.Component{
                 label: {
                     show: true
                 },
+                select:false,
                 data:data
             }],
             visualMap: {
@@ -142,7 +143,7 @@ export default class ChinaMapChart extends React.PureComponent{
             'lineNum':'系统',
             'inunitNum':'室内机',
         }
-        return(<div>
+        return(<div style={{ position:"relative" }}>
             <Select defaultValue="buildingNum" value={this.state.unit} onChange={this.handleSelectorChange} style={{ width: '8vw',float:'left',position:'absolute',zIndex:1000 }}>
                 <Option key='buildingNum' value="buildingNum">物件</Option>
                 <Option key='lcNoNum' value="lcNoNum">LC No</Option>

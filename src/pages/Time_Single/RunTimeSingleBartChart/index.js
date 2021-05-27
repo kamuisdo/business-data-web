@@ -54,8 +54,19 @@ class RunTimeSingleBar extends React.Component{
     loadData(){
         let {query,requestFn} = this.props;
         return requestFn(this.instance,query).then((data)=>{
-            data = formatTimeData(data,query)
-            this.updateSeries(data)
+            console.log('---- 单对象运转时间 合并 ----')
+            console.log(data)
+            let temper = data[0].temper || data[1].timer
+            let time = data[0].time || data[1].time
+            time = time.map((v)=>{
+                let temperData = temper.find((item)=>{ return item.recordDate === (v.RECORD_DATE || v.recordDate) })
+                let thisTemper = temperData ? temperData.maxWeather : null
+                v.temper = thisTemper
+                return v
+            })
+            console.log(time)
+            let formatted = formatTimeData(time,query)
+            this.updateSeries(formatted)
         })
     }
 
@@ -77,7 +88,7 @@ class RunTimeSingleBar extends React.Component{
 
     // 设置line的参数
     updateSeries(seriesData){
-        let { warm,cold } = seriesData;
+        let { warm,cold,temper } = seriesData;
         let series = [
             {
                 name:'暖房',
@@ -104,19 +115,19 @@ class RunTimeSingleBar extends React.Component{
                 barWidth:2,
                 data:cold
             },
-            // {
-            //     name:'室外气温',
-            //     type: 'line',
-            //     yAxisIndex:1,
-            //     itemStyle: {
-            //         color: '#B9B9B9'
-            //     },
-            //     lineStyle:{
-            //         width: 2
-            //     },
-            //     showSymbol: false,
-            //     data:temper
-            // }
+            {
+                name:'室外气温',
+                type: 'line',
+                yAxisIndex:1,
+                itemStyle: {
+                    color: '#B9B9B9'
+                },
+                lineStyle:{
+                    width: 2
+                },
+                showSymbol: false,
+                data:temper
+            }
         ]
         this.instance.setOption({ series })
     }

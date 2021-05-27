@@ -6,6 +6,7 @@ import max from 'lodash/max'
 import min from 'lodash/min'
 import maxBy from 'lodash/maxBy'
 import throttle from 'lodash/throttle'
+import debounce from 'lodash/debounce'
 import uniq from 'lodash/uniq'
 import { Slider } from 'antd';
 import dayjs from "dayjs";
@@ -17,7 +18,7 @@ class AirMap extends React.Component{
     constructor(props) {
         super(props);
         this.instance = null;
-        this.state = { time:null }
+        this.state = { time:null,ifCurrentHasData:true }
         this.sliderKey = []
         this.handleSliderChange = this.handleSliderChange.bind(this)
     }
@@ -57,7 +58,7 @@ class AirMap extends React.Component{
         if(!firstDay){
             return
         }
-        this.setState({ time:firstDay })
+        this.setState({ time:firstDay,ifCurrentHasData:true })
         // 根据Day获取数据
         let dayData = this.getDataByDay(data,firstDay)
         // 计算可视化的最大值和最小值
@@ -83,7 +84,7 @@ class AirMap extends React.Component{
             tooltip: {
                 trigger: 'item',
                 formatter: (params)=>{
-                    console.log(params)
+                    // console.log(params)
                     let {seriesName,data,marker} = params;
                     let sensorItem = that.getSensorNameByPosition(sensor,data[0],data[1])
                     let sensorName = sensorItem ? sensorItem.name : 'Error'
@@ -119,6 +120,11 @@ class AirMap extends React.Component{
                 orient: 'horizontal',
                 right: 'right',
                 top: 'top',
+                textStyle: {
+                    lineHeight: 36,
+                    height:36,
+                    width:36,
+                },
                 itemWidth:8,
                 itemHeight:200,
                 formatter: function (value) {
@@ -130,7 +136,7 @@ class AirMap extends React.Component{
             },
             series: series
         })
-        console.log(option)
+        // console.log(option)
         myChart.setOption(option);
 
         this.initXAxisChart()
@@ -202,24 +208,60 @@ class AirMap extends React.Component{
 
     // slider的值发生变化时，更新热力图
     handleSliderChange(value){
+        console.log('---- handleSliderChange ----')
+        console.log(value)
         let that = this;
-        let t = throttle((value)=>{
-            let {data} = that.props
-            let time = that.sliderKey[value];
-            that.setState({ time })
-            let dayData = this.getDataByDay(data,time)
-            let {maxVal,minVal} = this.getMaxMin(dayData)
-            let {series} = this.updateSeries(dayData);
-            that.instance.setOption({
-                series,
-                visualMap: {
-                    min: minVal,
-                    max: maxVal
-                }
-            });
-        },1000)
-        console.log(value);
-        t(value)
+        let {data} = that.props
+        let time = that.sliderKey[value];
+
+        let dayData = this.getDataByDay(data,time)
+        console.log(dayData)
+        let ifCurrentHasData = false
+        for(let i=0;i<dayData.length;i++){
+            if(dayData[i]){
+                ifCurrentHasData = true
+                break
+            }
+        }
+        console.log(ifCurrentHasData)
+        that.setState({ time,ifCurrentHasData })
+        let {maxVal,minVal} = !ifCurrentHasData ? {maxVal:1,minVal: 0} : this.getMaxMin(dayData)
+        let {series} = !ifCurrentHasData ? { series:[] } : this.updateSeries(dayData);
+        console.log(series)
+        setTimeout(that.instance.setOption({
+            series,
+            visualMap: {
+                min: minVal,
+                max: maxVal
+            }
+        }),500)
+
+
+        // let t = throttle((value)=>{
+        //     let {data} = that.props
+        //     let time = that.sliderKey[value];
+        //     that.setState({ time })
+        //     let dayData = this.getDataByDay(data,time)
+        //     let {maxVal,minVal} = this.getMaxMin(dayData)
+        //     let {series} = this.updateSeries(dayData);
+        //     console.log('---- debounce ----')
+        //     try {
+        //         // that.instance.clear()
+        //         that.instance.setOption({
+        //             series,
+        //             visualMap: {
+        //                 min: minVal,
+        //                 max: maxVal
+        //             }
+        //         });
+        //
+        //     }catch (err){
+        //         console.log(err)
+        //     }
+        //
+        // },1000)
+        // // console.log(value);
+        // t(value)
 
     }
 
@@ -281,18 +323,32 @@ class AirMap extends React.Component{
         temp = temp.sort((a,b)=>{
             return dayjs(a)-dayjs(b)
         })
-        return temp
+        // 取到最大值和最小值之后，按照小时为单位获取时间
+        console.log('---- air map getSliderTimeKey ---')
+        console.log(temp)
+        let minTime = temp[0]
+        let maxTime = temp[temp.length-1]
+        let gapDay = dayjs(maxTime).diff(dayjs(minTime),'hour')
+        console.log(gapDay)
+        let final = []
+        for(let i=0;i<gapDay;i++){
+            final.push(dayjs(minTime).add(i,'hour').format('YYYY/MM/DD HH:00'))
+        }
+        console.log(final)
+
+        return final
     }
 
 
     render() {
         let {id,data,handleRefresh,title} = this.props;
-        let {time} = this.state;
-        console.log('--- rend ---');
-        console.log(data);
+        let {time,ifCurrentHasData} = this.state;
         let sliderKey = this.sliderKey;
+        // console.log('--- airMap  rend ---');
+        // console.log(sliderKey);
         return  (data===false) ? <ErrorChart handleClick={handleRefresh}/> : ifNoData(data) ? <><h4>{title}</h4><NoChart/></> : <div style={{position:'relative'}}>
             <div id={id} style={{height:'360px'}}></div>
+            { !ifCurrentHasData && <div id={`${id}_noData`} style={{ height:'260px',width:'calc(100% - 20px)',position:'absolute',zIndex:99,bottom: '45px',backgroundColor:'#fff',display:'flex',justifyContent:'center',alignItems:'center' }}>此时刻无数据</div> }
             <div id={`${id}_xAxis`} style={{height:'80px',width:'calc(100% - 20px)',position:'absolute',zIndex:99,bottom: '-15px'}}></div>
             <span style={{ position:'absolute',bottom: '14px',color:'#7A8392'}}>{time}</span>
             <div style={{width:'calc(100% - 20px)',position:'absolute',marginLeft:'13px',zIndex:100,bottom:'-10px'}}>
@@ -304,7 +360,7 @@ class AirMap extends React.Component{
                             return sliderKey[value] 
                             }
                         }
-                        onChange={this.handleSliderChange}
+                        onChange={debounce(this.handleSliderChange,500)}
                         min={0} max={sliderKey.length-1}/>
             </div>
 

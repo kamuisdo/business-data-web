@@ -166,7 +166,7 @@ class LcLinkCount extends React.Component{
             <div style={{height:'360px'}}>
                 <div className="LcLinkCountChart-text-box" style={{ position:"absolute",display:'flex',justifyContent:'center',flexDirection:'column',width:'50%',height:'100%' }}>
                     <div style={{ margin:'0 auto' }}>
-                        <p style={{ color:'#7A8392',fontSize:'12px',textAlign:'center',margin:'0px' }}>系统总数</p>
+                        <p style={{ color:'#7A8392',fontSize:'12px',textAlign:'center',margin:'0px' }}>LcNo总数</p>
                         <p style={{ fontSize:'24px',margin:'0px',textAlign:'center' }}>{ total === null ? '加载中' : numeral(total).format('0,0')}</p>
                     </div>
                 </div>

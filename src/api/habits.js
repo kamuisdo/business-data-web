@@ -1,6 +1,7 @@
 import requestFactory from "../utils/request";
 import { TimeTypeEnum } from '../enum/timeType'
 import dayjs from 'dayjs';
+import { parseVal } from '../utils/utils'
 
 const getHabitsSingleLine = requestFactory({ 
     url:'post/report/query/commerce/v1/device/getUsageHabitConsume',
@@ -16,25 +17,23 @@ const getHabitsMultiLine = requestFactory({
 
 // 格式化返回值
 const formatHabitsData = (data,query)=>{
-    let format = TimeTypeEnum.get(query.timeType).format
+    let formatFn = TimeTypeEnum.get(query.timeType).formatFn
     let setTemper = []
     let returnTemper = []
     let energy = []
     // data = data.map((v)=>{ 
-    //     let t = dayjs(v.RECORD_DATE).unix()
+    //     let t = dayjs(v.recordDate).unix()
     //     v.time = t
     //     return v
     // })
-    data = data.sort((a,b)=>{ 
-        let at = dayjs(a.RECORD_DATE).unix()
-        let bt = dayjs(b.RECORD_DATE).unix()
-        return at - bt
+    data = data.sort((a,b)=>{
+        return a.recordDate - b.recordDate
     })
     data.forEach((v)=>{    
-        let time =  dayjs(v.RECORD_DATE).format(format)
-        setTemper.push([time,v.artmp])
-        returnTemper.push([time,v.arsut])
-        energy.push([time,v.sew])
+        let time =  formatFn(v.recordDate)
+        setTemper.push([time,parseVal(v.artmp)])
+        returnTemper.push([time,parseVal(v.arsut)])
+        energy.push([time,parseVal(v.energy)])
     })
     return {setTemper,returnTemper,energy}
 }

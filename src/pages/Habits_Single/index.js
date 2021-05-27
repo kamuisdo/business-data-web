@@ -6,6 +6,7 @@ import ProjectCascadeSelector from "../../components/ProjectCascadeSelector";
 import NoChart from "../../components/NoChart";
 import PageLayout from "../Layout";
 import * as api from '../../api/habits'
+import { getEnergyBarChart } from '../../api/energy'
 import HabitsSingleChart from "./HabitsSingleChart";
 
 export default class HabitsSinglePage extends React.Component{
@@ -27,6 +28,14 @@ export default class HabitsSinglePage extends React.Component{
 
     render() {
         let {formData} = this.state;
+        // 合并电量
+        // let getEnergyAndHabits = (query)=>{
+        //     return Promise.all([
+        //         getEnergyBarChart(query).then((data)=>{ return { energy:data } }),
+        //         api.getHabitsSingleLine(query).then((data)=>{ return { habit:data } })
+        //     ])
+        // }
+
         return (
             <PageLayout title="单物件设定温度、回风温度以及耗电量统计">
                 <div style={{display:'block'}}>

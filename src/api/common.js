@@ -153,6 +153,8 @@ const getBuildingDetailById = requestFactory({
     mockUrl: 'get/common/getBuildingDetailById'
 })
 
+const login =  requestFactory({ url:'post/report/query/common/v1/user/login',hostType:'REACT_APP_HOST' })
+
 
 export {
     getProvinceTable,
@@ -169,5 +171,6 @@ export {
     getSystemList,
     getInnerList,
     getProjectTableList,
-    getBuildingDetailById
+    getBuildingDetailById,
+    login
 }

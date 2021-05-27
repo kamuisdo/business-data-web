@@ -1,5 +1,7 @@
 import axios from "axios";
 import { notification } from 'antd';
+import store from 'store'
+import storeKeyName from "../utils/storeKeyName";
 
 let defaultConfig = {
     timeout:10000000,
@@ -38,8 +40,11 @@ function getApiCommandType(url){
 
 // 请求失败的通知
 function errorNotification(resOrErr){
+    let {code,msg} = resOrErr
+    let errCode = code || '00000'
+    let message = msg || '数据请求失败'
     notification.open({
-        message: '数据请求失败',
+        message: message,
         description:'温馨提示：因为服务器问题，暂时无法请求到数据。若需查看数据，可以进行刷新或稍后重试',
         className: 'error-notification',
         style: {
@@ -48,7 +53,7 @@ function errorNotification(resOrErr){
         // duration:null
     });
     // 默认将错误继续抛出
-    throw new Error(resOrErr)
+    throw new Error(`${errCode}:${message}`)
 }
 
 /**
@@ -80,28 +85,42 @@ export default function requestFactory(apiOpt={}){
 
     return function (data={},requestOpt={}){
         let dataKey = method === 'get' ? 'params' : 'data';
+        let token = store.get(storeKeyName.token)
+        let headers = token ? { headers:{ loginToken: token } } : {}
         let axiosConfig = Object.assign({},defaultConfig,apiOpt,requestOpt,{
             url:url,
             baseURL: host,
             method:method,
-            [dataKey]:data
-        })
+            [dataKey]:data,
+            // headers:{
+            //     'loginToken':store.get(storeKeyName.token) || ''
+            //     // 'loginToken':'123123123123123'
+            // }
+        },headers)
         // console.log(dataKey);
         // console.log(apiOpt);
         // console.log(requestOpt);
         // console.log(axiosConfig);
         return axios.request(axiosConfig).then((res)=>{
+            // console.log('--- res ----')
+            // console.log(res)
             let ifError = res.data.code !== 0;
             if(ifError){
                 //TODO 此处可加入默认的发生错误时的副作用
                 console.log('-  ifError --');
-                errorNotification(res)
+                let code = res.data.code
+                let msg = res.data.msg
+                throw new Error(`${code}:${msg}`)
             }
             return res.data.data
         })
-        // .catch((err)=>{
-        //     console.log('-  catch --');
-        //     errorNotification(err)
-        // })
+        .catch((err)=>{
+            console.log('-- catch --');
+            console.log(err)
+            let ifNetworkError = err.message.indexOf(':')<0
+            let code = ifNetworkError ? '00000' : err.message.split(':')[0];
+            let msg = ifNetworkError ? '数据请求失败' : err.message.split(':')[1];
+            errorNotification({ code,msg })
+        })
     }
 }

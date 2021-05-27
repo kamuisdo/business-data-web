@@ -7,7 +7,7 @@ import './index.less'
 import {ifNoDataFn} from "../../../api/runtime";
 import NoChart from "../../../components/NoChart";
 
-class HabitsMulti extends React.Component {
+class HabitsMulti extends React.PureComponent {
 
     constructor(props) {
         super(props);
@@ -40,11 +40,11 @@ class HabitsMulti extends React.Component {
                     boundaryGap: false,
                     name: '温度(°)'
                 },
-                {
-                    type: 'value',
-                    boundaryGap: false,
-                    name: '耗电量(kw)'
-                }
+                // {
+                //     type: 'value',
+                //     boundaryGap: false,
+                //     name: '耗电量(kw)'
+                // }
             ],
             xAxis: {
                 type: 'time',
@@ -61,10 +61,33 @@ class HabitsMulti extends React.Component {
     loadData() {
         let {selected, requestFn,query,type} = this.props;
         let key = type === '物件' ? 'buildingIdArray' : type === 'LcNo' ? 'terminalIdArray' : 'lineIdArray';
+        let energyType = type === '物件' ? 'build' : type === 'LcNo' ? 'terminal' : 'line'
         let idList = selected.map((v)=>{ return v.key })
-        let t = Object.assign({ [key]:idList },query)
+        let t = Object.assign({ [key]:idList,idList:idList,type:energyType},query)
         let noDataDom = <div className='chart-box'><NoChart/></div>
         return requestFn(this.instance, t,{ ifNoDataFn,noDataDom }).then((data) => {
+
+            // 合并电量
+            // let energy = data[0].energy || data[1].energy;  // { [id]:[{...}] }
+            // let habit = data[0].habit || data[1].habit; // [{ [id]:[] },{ [id]:[] }  ]
+            // habit = habit.map((v,i)=>{
+            //     let idKey = selected[i].key; // buildingId or LcNoId or lineId
+            //     let returnData = v[idKey]
+            //     if(returnData.length){
+            //         returnData = returnData.map((t)=>{
+            //             let energyData = ((energy&&energy[idKey]) || []).find((item)=>{ return item.recordDate === t.recordDate })
+            //             let thisEnergy = energyData ? (energyData.coldElectric + energyData.hotElectric) : null;
+            //             t.energy = thisEnergy
+            //             return t
+            //         })
+            //         let formattedData = formatHabitsData(returnData,query)
+            //         return formattedData
+            //     }
+            //     return []
+            // })
+            // this.updateSeries(habit)
+
+
             data = data.map((v,i)=>{
                 let returnData = v[selected[i].key]
                 if(returnData.length){
@@ -72,8 +95,9 @@ class HabitsMulti extends React.Component {
                     return formattedData
                 }
                 return []
-                
+
             })
+
             this.updateSeries(data)
         })
     }
@@ -97,18 +121,18 @@ class HabitsMulti extends React.Component {
                     showSymbol: false,
                     data: setTemper
                 },
-                {
-                    name: `耗电量${index + 1}`,
-                    type: 'line',
-                    yAxisIndex: 1,
-                    itemIndex: index,
-                    itemType: 'energy',
-                    // itemStyle: {
-                    //     color: '#2B6AFF',
-                    // },
-                    showSymbol: false,
-                    data: energy
-                },
+                // {
+                //     name: `耗电量${index + 1}`,
+                //     type: 'line',
+                //     yAxisIndex: 1,
+                //     itemIndex: index,
+                //     itemType: 'energy',
+                //     // itemStyle: {
+                //     //     color: '#2B6AFF',
+                //     // },
+                //     showSymbol: false,
+                //     data: energy
+                // },
                 {
                     name: `回风温度${index + 1}`,
                     type: 'line',
@@ -142,6 +166,7 @@ class HabitsMulti extends React.Component {
             })
         })
         this.instance.setOption(getDefaultSeriesOpt({series}))
+        // console.log(legend)
         this.setState({ legend })
     }
 
@@ -198,6 +223,12 @@ class HabitsMulti extends React.Component {
         this.setState({legend})
     }
 
+    componentWillUnmount() {
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
+
     render() {
         let {selected} = this.props;
         let {legend} = this.state;
@@ -218,9 +249,9 @@ class HabitsMulti extends React.Component {
                                     <div><Checkbox checked={setTemperChecked.checked}
                                                    onChange={(e)=>this.onCheckChange(e,'setTemper')}
                                                    indeterminate={setTemperChecked.indeterminate}>设定温度</Checkbox></div>
-                                    <div><Checkbox checked={energyChecked.checked}
-                                                   onChange={(e)=>this.onCheckChange(e,'energy')}
-                                                   indeterminate={energyChecked.indeterminate}>耗电量</Checkbox></div>
+                                    {/*<div><Checkbox checked={energyChecked.checked}*/}
+                                    {/*               onChange={(e)=>this.onCheckChange(e,'energy')}*/}
+                                    {/*               indeterminate={energyChecked.indeterminate}>耗电量</Checkbox></div>*/}
                                     <div><Checkbox checked={returnTemperChecked.checked}
                                                    onChange={(e)=>this.onCheckChange(e,'returnTemper')}
                                                    indeterminate={returnTemperChecked.indeterminate}>回风温度</Checkbox>
@@ -229,9 +260,9 @@ class HabitsMulti extends React.Component {
                                 <div className="legend-item-box">
                                     {
                                         selected.map((v, i) => {
-                                            let setTemper = legend[i * 3]
-                                            let energy = legend[i * 3 + 1]
-                                            let returnTemper = legend[i * 3 + 2]
+                                            let setTemper = legend[i * 2]
+                                            // let energy = legend[i * 3 + 1]
+                                            let returnTemper = legend[i * 2 + 1]
                                             return (<div className="legend-item-row" key={i}>
                                                 <span
                                                     onClick={()=>this.onClickLegendItem(setTemper.name)}
@@ -240,13 +271,13 @@ class HabitsMulti extends React.Component {
                                                           style={{backgroundColor: `${setTemper.color}`}}></span>
                                                     {setTemper.name}
                                                 </span>
-                                                <span
-                                                    onClick={()=>this.onClickLegendItem(energy.name)}
-                                                    className={`legend-item ${energy.selected ? '' : 'legend-item-disabled'}`}>
-                                                    <span className="legend-item-point"
-                                                          style={{backgroundColor: `${energy.color}`}}></span>
-                                                    {energy.name}
-                                                </span>
+                                                {/*<span*/}
+                                                {/*    onClick={()=>this.onClickLegendItem(energy.name)}*/}
+                                                {/*    className={`legend-item ${energy.selected ? '' : 'legend-item-disabled'}`}>*/}
+                                                {/*    <span className="legend-item-point"*/}
+                                                {/*          style={{backgroundColor: `${energy.color}`}}></span>*/}
+                                                {/*    {energy.name}*/}
+                                                {/*</span>*/}
                                                 <span
                                                     onClick={()=>this.onClickLegendItem(returnTemper.name)}
                                                     className={`legend-item ${returnTemper.selected ? '' : 'legend-item-disabled'}`}>

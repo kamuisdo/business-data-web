@@ -47,6 +47,7 @@ export default class EnergySinglePage extends React.Component{
         let query = Object.assign(value,{ type:0 })
         api.getEnergyBarChart(query).then((data)=>{
             let ifNoData = data === null || (data && data.length === 0) || data === undefined
+            data = data.sort((a,b)=>{ return a.recordDate - b.recordDate })
             this.setState({ data:data,ifError:false,ifNoData })
         }).catch((err)=>{
             this.setState({ ifError:true,ifNoData:false })
@@ -65,14 +66,13 @@ export default class EnergySinglePage extends React.Component{
             <PageLayout title="单器械电力消耗统计">
                 <div style={{display:'block'}}>
                     <SearchForm onFinish={this.handleSearch}>
-                        <ProjectCascadeSelector />
+                        <ProjectCascadeSelector hideFrom="内机" />
                         <div className="searchForm-row">
                             <TimeRangeSelector required/>
                         </div>
                         <div className="searchForm-row">
                             <TimeUnitSelector required/>
                         </div>
-
                     </SearchForm>
                 </div>
                 <div className="chart-box">

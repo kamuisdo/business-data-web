@@ -19,6 +19,7 @@
     "echarts": "^5.0.2",
     "echarts-bmap": "^1.0.3",
     "env-cmd": "^10.1.0",
+    "eventemitter3": "^4.0.7",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "numeral-es6": "^1.0.0",
@@ -27,12 +28,13 @@
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.0",
-    "dotenv": "^8.2.0"
+    "store": "^2.0.12",
+    "uuid": "^8.3.2",
+    "web-vitals": "^1.1.0"
   },
   "scripts": {
     "start": "dotenv -e .env.development craco start",
-    "build": "dotenv -e .env.production craco build",
+    "build": "dotenv -e .env.production craco build && tar cvf build.tar build",
     "build-server": "serve -s build",
     "test": "craco test",
     "eject": "react-scripts eject",
@@ -48,7 +50,9 @@
     "production": [
       ">0.2%",
       "not dead",
-      "not op_mini all"
+      "not op_mini all",
+      "not ie <= 8"
+
     ],
     "development": [
       "last 1 chrome version",

@@ -68,7 +68,22 @@ class Air extends React.Component{
             },
             series: series
         })
-        // console.log(option)
+        // disabled的传感器不显示
+        let disabledSensor = data.filter((v)=>{ return v.disabled }).map((v)=>{ return { name:v.name } })
+        let ifRend = false
+        if(disabledSensor.length){
+            myChart.on('rendered', function () {
+                if(!ifRend){
+                    myChart.dispatchAction({
+                        type: 'legendToggleSelect',
+                        batch:disabledSensor
+                    });
+                    ifRend = true
+                }
+
+            });
+        }
+
         myChart.setOption(option);
     }
 

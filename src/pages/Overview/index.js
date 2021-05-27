@@ -30,6 +30,7 @@ export default class OverviewPage extends React.Component{
         }
         this.handleClickSearchFormBtn = this.handleClickSearchFormBtn.bind(this)
         this.handleSearch = this.handleSearch.bind(this)
+        this.formRef = React.createRef()
     }
 
     handleClickSearchFormBtn(){
@@ -40,6 +41,9 @@ export default class OverviewPage extends React.Component{
 
     handleSearch(value){
         // console.log(value);
+        console.log(this.formRef.current)
+        let t = this.formRef.current.formRefs.current.getFieldsValue(true)
+        console.log(t)
         this.setState({
             formData:value
         })
@@ -58,7 +62,7 @@ export default class OverviewPage extends React.Component{
             <PageLayout title="商用智能VRV整体概况">
                 <Button style={{float:'right',marginTop:'-60px'}} onClick={this.handleClickSearchFormBtn} type="link">搜索条件{searchBtnIcon}</Button>
                 <div style={searchFormStyle}>
-                    <SearchForm initialValues={initialValues} onFinish={this.handleSearch}>
+                    <SearchForm ref={this.formRef} initialValues={initialValues} onFinish={this.handleSearch}>
                         <div className="searchForm-row">
                             <TimeRangeSelector required title="创建时间"/>
                         </div>

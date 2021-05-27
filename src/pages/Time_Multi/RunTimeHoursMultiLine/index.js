@@ -59,8 +59,7 @@ class RunTimeHoursMulti extends React.Component{
         let {selected,requestFn,type,query} = this.props;
         let key = type === '物件' ? 'buildingIdArray' : type === 'LcNo' ? 'terminalIdArray' : 'lineIdArray';
         let idList = selected.map((v)=>{ return v.key })
-        let t = Object.assign({ [key]:idList },query)
-        t.timeType = 'hour'
+        let t = Object.assign({ [key]:idList },query,{ timeType: 'hour'})
         return requestFn(this.instance,t,{ ifNoDataFn }).then((data)=>{
             data = data.map((v,i)=>{
                 let returnData = v[selected[i].key]

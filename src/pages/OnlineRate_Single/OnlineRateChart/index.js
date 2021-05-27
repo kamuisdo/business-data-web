@@ -32,6 +32,9 @@ class OnlineRate extends React.Component{
                     return `${params.seriesName}<br/><span>${params.marker}${date}：${Math.floor(value*100)}%</span>`
                 }
             },
+            legend:{
+                selectedMode:false
+            },
             yAxis: {
                 name:'在线率',
                 type: 'value',

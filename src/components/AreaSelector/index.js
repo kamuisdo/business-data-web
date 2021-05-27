@@ -2,9 +2,11 @@ import React from "react";
 import * as api from '../../api/common'
 import ApiSelect from "../ApiSelect";
 import {Form} from 'antd'
+import EE from '../../utils/eventEmitter'
+import FormContext from '../SearchForm/formContext'
+import eventName from "../../utils/eventName";
 
-
-export default class AreaSelector extends React.Component{
+class AreaSelector extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
@@ -18,7 +20,35 @@ export default class AreaSelector extends React.Component{
         this.cityRef = React.createRef()
     }
 
-
+    // reset(){
+    //     // console.log(this.areaRef)
+    //     console.log(this.provinceRef.current)
+    //     // console.log(this.cityRef)
+    //     if(this.provinceRef.current){
+    //         this.provinceRef.current.reset()
+    //     }
+    //
+    // }
+    //
+    // componentDidMount() {
+    //     let form = this.context ? this.context.current : null
+    //     console.log('--- AreaSelector  componentDidMount -----')
+    //     console.log(this.context)
+    //     console.log(form)
+    //     EE.on(`${eventName.FormRestPrefix}111`,()=>{
+    //         this.reset()
+    //     })
+    //     if(form){
+    //
+    //         console.log(form.formId)
+    //         // EE.on(`${eventName.FormRestPrefix}`)
+    //     }
+    //
+    // }
+    //
+    // componentWillUnmount() {
+    //
+    // }
 
 
     render() {
@@ -36,6 +66,7 @@ export default class AreaSelector extends React.Component{
                         requestFn={ifAreaIncludeAll ? api.getRegionInfoIncludeAll : api.getRegionInfo}
                         textField="text"
                         valueField="value"
+                        formfield="regionCode"
                         cascadeBy={[this.provinceRef]}
                     />
                 </Form.Item>
@@ -50,6 +81,7 @@ export default class AreaSelector extends React.Component{
                         requestFn={api.getProvinceInfo}
                         textField="text"
                         valueField="value"
+                        formfield="provinceCode"
                         cascadeBy={[this.cityRef]}
                         cascading={this.areaRef}
                         cascadeParams={(value)=>{ return {regionCode:value} }}
@@ -67,6 +99,7 @@ export default class AreaSelector extends React.Component{
                         requestFn={api.getCityInfo}
                         textField="text"
                         valueField="value"
+                        formfield="cityCode"
                         cascadeBy={[this.projectTypeRef]}
                         cascading={this.provinceRef}
                         cascadeParams={(value)=>{ return {provinceCode:value} }}
@@ -77,3 +110,7 @@ export default class AreaSelector extends React.Component{
         )
     }
 }
+
+AreaSelector.contextType = FormContext;
+
+export default AreaSelector

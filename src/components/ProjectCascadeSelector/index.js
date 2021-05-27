@@ -44,6 +44,7 @@ export default class ProjectCascadeSelector extends React.Component{
                             requestFn={api.getRegionInfo}
                             textField="text"
                             valueField="value"
+                            formfield="regionCode"
                             cascadeBy={[this.provinceRef]}
                         />
                     </Form.Item>
@@ -58,6 +59,7 @@ export default class ProjectCascadeSelector extends React.Component{
                             requestFn={api.getProvinceInfo}
                             textField="text"
                             valueField="value"
+                            formfield="provinceCode"
                             cascadeBy={[this.cityRef]}
                             cascading={this.areaRef}
                             cascadeParams={(value)=>{ return {regionCode:value} }}
@@ -75,6 +77,7 @@ export default class ProjectCascadeSelector extends React.Component{
                             requestFn={api.getCityInfo}
                             textField="text"
                             valueField="value"
+                            formfield="cityCode"
                             cascadeBy={[this.projectTypeRef]}
                             cascading={this.provinceRef}
                             cascadeParams={(value)=>{ return {provinceCode:value} }}
@@ -94,6 +97,7 @@ export default class ProjectCascadeSelector extends React.Component{
                             cascadeBy={[this.projectRef]}
                             textField="value"
                             valueField="id"
+                            formfield="buildingType"
                         />
                     </Form.Item>
                 </div>
@@ -112,6 +116,7 @@ export default class ProjectCascadeSelector extends React.Component{
                                 requestFn={api.getProjectList}
                                 textField="buildingName"
                                 valueField="buildingId"
+                                formfield="buildingId"
                                 cascadeBy={[this.lcNoRef]}
                                 cascading={this.projectTypeRef}
                                 cascadeParams={(value)=>{
@@ -139,6 +144,7 @@ export default class ProjectCascadeSelector extends React.Component{
                                 requestFn={api.getLcNoList}
                                 textField="lcNo"
                                 valueField="terminalId"
+                                formfield="terminalId"
                                 cascadeBy={[this.systemRef]}
                                 cascading={this.projectRef}
                                 cascadeParams={(value)=>{
@@ -160,6 +166,7 @@ export default class ProjectCascadeSelector extends React.Component{
                                 requestFn={api.getSystemList}
                                 textField="lineName"
                                 valueField="lineId"
+                                formfield="lineId"
                                 cascading={this.lcNoRef}
                                 cascadeBy={[this.innerRef]}
                                 cascadeParams={(value)=>{
@@ -179,8 +186,9 @@ export default class ProjectCascadeSelector extends React.Component{
                                 showSearch={true}
                                 ref={this.innerRef}
                                 requestFn={api.getInnerList}
-                                textField="modelTypeId"
+                                textField="unitId"
                                 valueField="unitId"
+                                formfield="unitId"
                                 cascading={this.systemRef}
                                 cascadeParams={(value)=>{
                                     return { lineId:value }

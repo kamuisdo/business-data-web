@@ -1,7 +1,7 @@
 import React from "react";
 import withEcharts from "../../../components/withEcharts";
 import {TimeTypeEnum} from '../../../enum/timeType';
-import dayjs from 'dayjs';
+import isNumber from 'lodash/isNumber'
 
 class EnergyBar extends React.Component{
 
@@ -48,7 +48,10 @@ class EnergyBar extends React.Component{
         }else{
             myChart.hideLoading();
         }
-        
+    }
+
+    parseVal(val){
+        return isNumber(val) ? val.toFixed(2) : '-'
     }
 
     // 设置line的参数
@@ -60,11 +63,11 @@ class EnergyBar extends React.Component{
         let warm =[]
         let cold = [];
         let temper =[];
-        let format = TimeTypeEnum.get(query.timeType).format;
+        let formatFn = TimeTypeEnum.get(query.timeType).formatFn;
         data.forEach((v)=>{
-            let time = dayjs(v.recordDate).format(format)
-            warm.push([time,v.hotElectric])
-            cold.push([time,v.coldElectric])
+            let time = formatFn(v.recordDate)
+            warm.push([time,this.parseVal(v.hotElectric)])
+            cold.push([time,this.parseVal(v.coldElectric)])
             temper.push([time,v.maxWeather])
         })
         let series = [

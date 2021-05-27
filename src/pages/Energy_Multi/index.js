@@ -67,7 +67,7 @@ export default class EnergyMultiPage extends React.Component{
             ifNoData:false
         })
         let chartFormData = this.state.chartFormData
-        let type = this.state.targetType === '物件' ? 'build' : this.state.targetType === 'LC_No' ? 'terminal' : 'line'
+        let type = this.state.targetType === '物件' ? 'build' : this.state.targetType === 'LcNo' ? 'terminal' : 'line'
         let idList = this.state.selected.map((v)=>{ return v.key })
         let query = Object.assign({},chartFormData,{ type,idList })
         api.getEnergyMultiLine(query).then((data)=>{
